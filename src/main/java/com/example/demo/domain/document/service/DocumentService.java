@@ -1,6 +1,7 @@
 package com.example.demo.domain.document.service;
 
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.domain.document.standard.Document;
 import com.example.demo.domain.genFile.service.GenFileService;
 import com.example.demo.standard.util.Ut;
@@ -36,7 +37,7 @@ public class DocumentService {
 
         String newBody = Ut.str.replace(doc.getBody(), "\\(" + TEMP_FILE_PATH + "/([^)]+)\\?type=temp\\)", (String url) -> {
             url = TEMP_FILE_PATH + "/" + url;
-            String newUrl = genFileService.tempToFile(url, (BaseEntity) doc, "common", "inBody", 0).getUrl();
+            String newUrl = genFileService.tempToFile(url, (BaseEntity) doc, "templates/common", "inBody", 0).getUrl();
             urlsMap.put(url, newUrl);
             return "(" + newUrl + ")";
         });

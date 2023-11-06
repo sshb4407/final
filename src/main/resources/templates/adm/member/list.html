@@ -1,0 +1,158 @@
+<html layout:decorate="~{adm/common/layout}">
+
+<head>
+    <title>회원목록</title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4 ">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-users"></i>
+            회원목록
+        </h1>
+
+        <div>
+
+            <div class="flex bg-base-100 sticky top-[64px] shadow-sm z-10 -mx-4 px-4 py-2 flex-wrap gap-2 items-center">
+                <div>
+                    <span class="label-txt">검색된 결과 개수</span>
+                    <span th:text="${memberPage.totalElements}"></span>
+                </div>
+                <div class="flex-grow"></div>
+                <div class="flex flex-wrap gap-2">
+                    <button class="btn btn-sm btn-primary" onclick="searchFormModal.showModal()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        검색어
+                        <span th:if="${UtThy.hasText(param.kw)}">`<span class="normal-case"
+                                                                        th:text="${param.kw}"></span>`</span>
+                    </button>
+                    <a th:if="${UtThy.hasText(param.kw)}" th:href="${@rq.currentUrlPath}"
+                       class="btn btn-sm btn-outline">
+                        <i class="fa-solid fa-xmark"></i>
+                        검색조건 지우기
+                    </a>
+                </div>
+            </div>
+
+            <dialog id="searchFormModal" class="modal">
+                <div class="modal-box">
+                    <form method="dialog">
+                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+
+                    <form class="bg-base rounded flex flex-col gap-6" onsubmit="submitSearchForm(this); return false;">
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">검색필터</span>
+                            </label>
+
+                            <select name="kwType" class="select select-bordered" th:value="${param.kwType}">
+                                <option value="all">전체</option>
+                                <option value="username">아이디</option>
+                                <option value="email">이메일</option>
+                                <option value="nickname">별명</option>
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">검색</span>
+                            </label>
+
+                            <input placeholder="검색어"
+                                   class="input input-bordered ws-full"
+                                   name="kw"
+                                   type="search"
+                                   th:value="${param.kw}"
+                            >
+                        </div>
+
+                        <div>
+                            <button class="btn btn-block btn-primary gap-1">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <span>검색</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <form method="dialog" class="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
+
+            <div class="mt-4"
+                 th:if="${memberPage.totalPages > 1}"
+                 th:with="queryStrBase = '?kwType=' + ${param.kwType != null ? param.kwType : ''} + '&kw=' + ${param.kw != null ? param.kw : ''} + '&'">
+                <div th:replace="common/fragments :: pagination(${memberPage}, ${queryStrBase}, 1)"></div>
+            </div>
+
+            <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[20px]">
+                <li th:each="member : ${memberPage.content}">
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+
+                            <div class="detail grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
+                                <div class="form-control col-span-full">
+                                    <div class="flex justify-center">
+                                        <img class="w-40 h-40 rounded-full"
+                                             th:src="${@memberService.getProfileImgUrl(member)}">
+                                    </div>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">회원번호</span>
+                                    </label>
+                                    <div th:text="${member.id}"></div>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">가입일</span>
+                                    </label>
+                                    <div th:text="${#temporals.format(member.createDate, 'yy.MM.dd')}"></div>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">아이디</span>
+                                    </label>
+                                    <div th:text="${member.username}"></div>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">별명</span>
+                                    </label>
+                                    <div th:text="${member.nickname}"></div>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">EMAIL</span>
+                                    </label>
+                                    <div th:text="${member.emailForPrint}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="mt-4"
+                 th:if="${memberPage.totalPages > 1}"
+                 th:with="queryStrBase = '?kwType=' + ${param.kwType != null ? param.kwType : ''} + '&kw=' + ${param.kw != null ? param.kw : ''} + '&'">
+                <div th:replace="common/fragments :: pagination(${memberPage}, ${queryStrBase}, 1)"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

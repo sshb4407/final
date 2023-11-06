@@ -1,0 +1,95 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title>내 정보</title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="max-w-2xl w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-user"></i>
+            내 정보
+        </h1>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title mb-4">프로필 이미지</h2>
+
+                <div class="detail flex flex-col gap-3">
+                    <div class="form-control">
+                        <div class="flex justify-center">
+                            <img class="w-40 h-40 rounded-full" th:src="${@rq.profileImgUrl}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <h2 class="card-title mb-4">개인정보</h2>
+
+                <div class="detail flex flex-col gap-3">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">가입일</span>
+                        </label>
+                        <div th:text="${#temporals.format(@rq.member.createDate, 'yy.MM.dd')}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">아이디</span>
+                        </label>
+                        <div th:text="${@rq.member.username}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">별명</span>
+                        </label>
+                        <div th:text="${@rq.member.nickname}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">EMAIL</span>
+                        </label>
+                        <div th:text="${@rq.member.emailForPrint}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <h2 class="card-title mb-4">제작자 정보</h2>
+
+                <div class="detail flex flex-col gap-3">
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">제작자 활동명</span>
+                        </label>
+                        <div th:text="${@rq.member.producerName}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <div class="text-center">
+                <a class="btn btn-link" href="/templates/usr/member/logout">로그아웃</a>
+                <a th:if="${@rq.member.modifyAvailable}" class="btn btn-link"
+                   href="/templates/usr/member/checkPassword?redirectUrl=/usr/member/modify">회원정보수정</a>
+                <a class="btn btn-link"
+                   href="/templates/usr/member/checkPassword?redirectUrl=/usr/member/beProducer"
+                   th:text="${@rq.producerPageName}"
+                ></a>
+                <a class="btn btn-link" href="/templates/usr/member/withdrawal">회원탈퇴</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

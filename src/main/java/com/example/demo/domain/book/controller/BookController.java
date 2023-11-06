@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/usr/book")
+@RequestMapping("/templates/usr/book")
 @RequiredArgsConstructor
 @Validated
 public class BookController {
@@ -54,7 +54,7 @@ public class BookController {
         Page<Book> bookPage = bookService.findByKw(kwType, kw, true, pageable);
         model.addAttribute("bookPage", bookPage);
 
-        return "usr/book/list";
+        return "templates/usr/book/list";
     }
 
     @GetMapping("/detail/{id}")
@@ -64,12 +64,12 @@ public class BookController {
     ) {
         Book book = bookService.findById(id).get();
 
-        Map<String, GenFile> filesMap = bookService.findGenFilesMapKeyByFileNo(book, "common", "attachment");
+        Map<String, GenFile> filesMap = bookService.findGenFilesMapKeyByFileNo(book, "templates/common", "attachment");
 
         model.addAttribute("book", book);
         model.addAttribute("filesMap", filesMap);
 
-        return "usr/book/detail";
+        return "templates/usr/book/detail";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -79,7 +79,7 @@ public class BookController {
 
         model.addAttribute("postKeywords", postKeywords);
 
-        return "usr/book/write";
+        return "templates/usr/book/write";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -94,7 +94,7 @@ public class BookController {
         if (Ut.file.exists(writeForm.getAttachment__1()))
             bookService.saveAttachmentFile(rsData.getData(), writeForm.getAttachment__2(), 2);
 
-        return rq.redirectOrBack("/usr/book/detail/%d".formatted(rsData.getData().getId()), rsData);
+        return rq.redirectOrBack("/templates/usr/book/detail/%d".formatted(rsData.getData().getId()), rsData);
     }
 
     @Getter
@@ -122,12 +122,12 @@ public class BookController {
     ) {
         Book book = bookService.findById(id).get();
 
-        Map<String, GenFile> filesMap = bookService.findGenFilesMapKeyByFileNo(book, "common", "attachment");
+        Map<String, GenFile> filesMap = bookService.findGenFilesMapKeyByFileNo(book, "templates/common", "attachment");
 
         model.addAttribute("book", book);
         model.addAttribute("filesMap", filesMap);
 
-        return "usr/book/modify";
+        return "templates/usr/book/modify";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -151,7 +151,7 @@ public class BookController {
         if (Ut.file.exists(modifyForm.getAttachment__2()))
             bookService.saveAttachmentFile(rsData.getData(), modifyForm.getAttachment__2(), 2);
 
-        return rq.redirectOrBack("/usr/book/detail/%d".formatted(rsData.getData().getId()), rsData);
+        return rq.redirectOrBack("/templates/usr/book/detail/%d".formatted(rsData.getData().getId()), rsData);
     }
 
     @Getter
@@ -181,7 +181,7 @@ public class BookController {
 
         RsData<?> rsData = bookService.remove(book);
 
-        return rq.redirectOrBack("/usr/book/myList", rsData);
+        return rq.redirectOrBack("/templates/usr/book/myList", rsData);
     }
 
     public boolean assertActorCanWrite() {

@@ -1,6 +1,7 @@
 package com.example.demo.domain.member.entity;
 
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
+import com.example.demo.base.jpa.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.*;

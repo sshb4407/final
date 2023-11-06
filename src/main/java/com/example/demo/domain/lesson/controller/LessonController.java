@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 @Controller
-@RequestMapping("/usr/lesson")
+@RequestMapping("/templates/usr/lesson")
 @RequiredArgsConstructor
 @Validated
 public class LessonController {
@@ -42,7 +42,7 @@ public class LessonController {
 
         model.addAttribute("lecture", lecture);
 
-        return "usr/lesson/write";
+        return "templates/usr/lesson/write";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -78,7 +78,7 @@ public class LessonController {
         model.addAttribute("lecture", lecture);
         model.addAttribute("lessons", lessons);
 
-        return "usr/lesson/modify";
+        return "templates/usr/lesson/modify";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -115,7 +115,7 @@ public class LessonController {
         model.addAttribute("lecture", lecture);
         model.addAttribute("lessons", lessons);
 
-        return "usr/lesson/modifySortNo";
+        return "templates/usr/lesson/modifySortNo";
     }
 
 
@@ -128,7 +128,7 @@ public class LessonController {
     ) {
         RsData<Lecture> modifySortNoRs = lessonService.modifySortNo(lectureId, order);
 
-        return rq.redirectOrBack("/usr/lesson/" + lectureId + "/modify", modifySortNoRs);
+        return rq.redirectOrBack("/templates/usr/lesson/" + lectureId + "/modify", modifySortNoRs);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -148,7 +148,7 @@ public class LessonController {
         model.addAttribute("lecture", lecture);
         model.addAttribute("lessons", lessons);
 
-        return rq.redirectOrBack("/usr/lesson/" + lectureId + "/modify", removeRs);
+        return rq.redirectOrBack("/templates/usr/lesson/" + lectureId + "/modify", removeRs);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -188,12 +188,12 @@ public class LessonController {
         String masterPlayListPath = getHlsSourcePath(lessonId, "master.m3u8");
 
         model.addAttribute("videoUrl", masterPlayListPath);
-        return "usr/lesson/hls";
+        return "templates/usr/lesson/hls";
     }
 
     private String getHlsSourcePath(long lessonId, String fileName) {
         Lesson lesson = lessonService.findById(lessonId).get();
-        GenFile genFile = genFileService.findBy(lesson.getModelName(), lesson.getId(), "common", "lessonVideo", 1).get();
+        GenFile genFile = genFileService.findBy(lesson.getModelName(), lesson.getId(), "templates/common", "lessonVideo", 1).get();
 
         return "/gen/" + genFile.getFileDir() + "/" + "hls" + "/" + fileName;
     }

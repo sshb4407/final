@@ -1,0 +1,61 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|강의 생성|"></title>
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet"/>
+    <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-quality-levels/2.0.9/videojs-contrib-quality-levels.min.js"></script>
+    <script th:src="@{/resource/common/videojs-hls-quality-selector.min.js}"></script>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+
+    <video id="video" class="video-js vjs-default-skin" controls preload="auto" autoplay="autoplay"
+           data-setup='{}'>
+
+    </video>
+
+    <script th:inline="javascript">
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var player = videojs('video');
+            player.ready(function() {
+                player.qualityLevels();
+                player.hlsQualitySelector({
+                    displayCurrentQuality : true ,
+                    getCurrentQuality : 'auto' ,
+                    sortAscending : false
+                });
+            });
+
+            player.src({
+                src: /*[[${videoUrl}]]*/,
+                type: 'application/x-mpegURL'
+            });
+
+        });
+
+    </script>
+
+</div>
+
+</body>
+
+<style>
+    .video-js .vjs-control-bar {
+        font-size: 2em; /* 이 값을 조정하여 컨트롤 바의 아이콘 크기를 변경 */
+    }
+
+    .video-js .vjs-control {
+        width: 60px; /* 이 값을 조정하여 컨트롤 버튼의 크기를 변경 */
+    }
+
+    .vjs-quality-selector .vjs-menu-title {
+        display: none !important;
+    }
+</style>
+
+</html>

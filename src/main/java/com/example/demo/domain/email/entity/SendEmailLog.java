@@ -1,6 +1,7 @@
 package com.example.demo.domain.email.entity;
 
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.base.rsData.RsData;
 import jakarta.persistence.Entity;
 import lombok.*;

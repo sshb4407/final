@@ -1,7 +1,8 @@
 package com.example.demo.domain.lecture.entity;
 
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.domain.lecture.entity.LectureTag;
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
 import com.example.demo.domain.document.standard.DocumentHavingTags;
 import com.example.demo.domain.document.standard.DocumentTag;
 import com.example.demo.domain.lesson.entity.Lesson;

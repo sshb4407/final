@@ -1,0 +1,46 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|태그 `${tagContent}`|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-hashtag"></i>
+            <span th:text="|게시물 태그 `${tagContent}`|"></span>
+        </h1>
+
+        <div class="flex bg-base-100 sticky top-[64px] shadow-sm z-10 -mx-4 px-4 py-2 flex-wrap gap-2 items-center">
+                <a class="btn btn-sm btn-outline" th:href="|/usr/lecture/list|">
+                    <i class="fa-solid fa-pen"></i>
+                    전체목록
+                </a>
+        </div>
+
+
+        <div>
+            <div class="mt-4" th:if="${lecturePage.totalPages > 1}"
+                 th:with="queryStrBase = ${tagContent} + '?'">
+                <div th:replace="common/fragments :: pagination(${lecturePage}, ${queryStrBase}, 1)"></div>
+            </div>
+
+            <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[20px]">
+                <li th:each="lecture : ${lecturePage.content}">
+                    <div th:replace="common/fragments :: lectureListItemCard(${lecture})"></div>
+                </li>
+            </ul>
+
+            <div class="mt-4" th:if="${lecturePage.totalPages > 1}"
+                 th:with="queryStrBase = ${tagContent} + '?'">
+                <div th:replace="common/fragments :: pagination(${lecturePage}, ${queryStrBase}, 1)"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

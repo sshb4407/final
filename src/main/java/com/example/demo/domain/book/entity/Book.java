@@ -1,6 +1,7 @@
 package com.example.demo.domain.book.entity;
 
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.domain.bookTag.entity.BookTag;
 import com.example.demo.domain.document.standard.DocumentHavingTags;
 import com.example.demo.domain.document.standard.DocumentTag;

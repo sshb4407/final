@@ -1,0 +1,38 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|글 태그 `${tagContent}`|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-hashtag"></i>
+            <span th:text="|글 태그 `${tagContent}`|"></span>
+        </h1>
+
+        <div>
+            <div class="mt-4" th:if="${postPage.totalPages > 1}"
+                 th:with="queryStrBase = ${tagContent} + '?'">
+                <div th:replace="common/fragments :: pagination(${postPage}, ${queryStrBase}, 1)"></div>
+            </div>
+
+            <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[20px]">
+                <li th:each="post : ${postPage.content}">
+                    <div th:replace="common/fragments :: postListItemCard(${post})"></div>
+                </li>
+            </ul>
+
+            <div class="mt-4" th:if="${postPage.totalPages > 1}"
+                 th:with="queryStrBase = ${tagContent} + '?'">
+                <div th:replace="common/fragments :: pagination(${postPage}, ${queryStrBase}, 1)"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

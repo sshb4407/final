@@ -1,6 +1,7 @@
 package com.example.demo.domain.article.repository;
 
-import com.example.demo.domain.entity.Article;
+
+import com.example.demo.domain.article.entity.Article;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import static com.example.demo.domain.article.entity.QArticle.article;
+
 
 @RequiredArgsConstructor
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom {

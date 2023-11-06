@@ -235,14 +235,14 @@ public class LessonService {
 
     @Transactional
     public RsData<GenFile> saveVideoFile(Lesson lesson, String attachmentFile, long fileNo) {
-        GenFile genFile = genFileService.saveForLesson(lesson.getModelName(), lesson.getId(), "common", "lessonVideo", fileNo, attachmentFile);
+        GenFile genFile = genFileService.saveForLesson(lesson.getModelName(), lesson.getId(), "templates/common", "lessonVideo", fileNo, attachmentFile);
 
         return new RsData<>("S-1", genFile.getId() + "번 파일이 생성되었습니다.", genFile);
     }
 
     @Transactional
     public void removeVideoFile(Lesson lesson, long fileNo) {
-        genFileService.removeLessonVideo(lesson.getModelName(), lesson.getId(), "common", "lessonVideo", fileNo);
+        genFileService.removeLessonVideo(lesson.getModelName(), lesson.getId(), "templates/common", "lessonVideo", fileNo);
     }
 
     public Optional<Lesson> findById(Long id) {

@@ -1,7 +1,7 @@
 package com.example.demo.domain.genFile.entity;
 
 import com.example.demo.base.app.AppConfig;
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+import com.example.demo.base.jpa.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -53,7 +53,7 @@ public class GenFile extends BaseEntity {
     }
 
     public String getDownloadUrl() {
-        return "/usr/genFile/download/" + getId();
+        return "/templates/usr/genFile/download/" + getId();
     }
 
     public String getFilePath() {

@@ -1,0 +1,68 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title>아이디 찾기</title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="max-w-2xl w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-regular fa-address-card"></i>
+            아이디 찾기
+        </h1>
+
+        <form class="flex flex-col gap-6" method="POST" onsubmit="submitFindUsernameForm(this); return false;"
+              th:action>
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">이메일</span>
+                </label>
+                <input autofocus class="input input-bordered" maxlength="80" name="email" placeholder="이메일"
+                       type="email">
+            </div>
+
+            <div>
+                <button class="btn btn-block btn-primary gap-1">
+                    <i class="fa-regular fa-address-card"></i>
+                    <span>아이디 찾기</span>
+                </button>
+
+                <div class="text-center">
+                    <a class="btn btn-link" href="/templates/usr/member/join">회원가입</a>
+                    <a class="btn btn-link" href="/templates/usr/member/login">로그인</a>
+                    <a class="btn btn-link" href="/templates/usr/member/findPassword">비밀번호 찾기</a>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            let submitFindUsernameFormDone = false;
+            function submitFindUsernameForm(form) {
+                if ( submitFindUsernameFormDone ) return;
+
+                form.email.value = form.email.value.trim();
+
+                if ( form.email.value.length == 0 ) {
+                    form.email.focus();
+                    toastWarning('이메일을 입력해주세요.');
+                    return;
+                }
+
+                if ( form.email.value.length < 4 ) {
+                    form.email.focus();
+                    toastWarning('이메일을 4자 이상 입력해주세요.');
+                    return;
+                }
+
+                form.submit();
+                submitFindUsernameFormDone = true;
+            }
+        </script>
+    </div>
+</div>
+
+</body>
+
+</html>

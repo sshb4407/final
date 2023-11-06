@@ -1,7 +1,7 @@
 package com.example.demo.domain.genFile.service;
 
 import com.example.demo.base.app.AppConfig;
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.domain.genFile.entity.GenFile;
 import com.example.demo.domain.genFile.repository.GenFileRepository;
 import com.example.demo.domain.member.entity.Member;
@@ -210,7 +210,7 @@ public class GenFileService {
     }
     @Transactional
     public GenFile saveTempFile(Member actor, MultipartFile file) {
-        return save("temp_" + actor.getModelName(), actor.getId(), "common", "editorUpload", 0, file);
+        return save("temp_" + actor.getModelName(), actor.getId(), "templates/common", "editorUpload", 0, file);
     }
 
     @Transactional

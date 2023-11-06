@@ -1,11 +1,11 @@
 package com.example.demo.domain.article.entity;
 
 
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.domain.board.entity.Board;
 import com.example.demo.domain.document.standard.DocumentHavingTags;
 import com.example.demo.domain.document.standard.DocumentTag;
-import com.example.demo.domain.entity.ArticleTag;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

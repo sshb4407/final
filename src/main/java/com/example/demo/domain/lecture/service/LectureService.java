@@ -91,14 +91,14 @@ public class LectureService {
 
     @Transactional
     public RsData<GenFile> saveAttachmentFile(Lecture lecture, String attachmentFile, long fileNo) {
-        GenFile genFile = genFileService.save(lecture.getModelName(), lecture.getId(), "common", "attachment", fileNo, attachmentFile);
+        GenFile genFile = genFileService.save(lecture.getModelName(), lecture.getId(), "templates/common", "attachment", fileNo, attachmentFile);
 
         return new RsData<>("S-1", genFile.getId() + "번 파일이 생성되었습니다.", genFile);
     }
 
     @Transactional
     public void removeAttachmentFile(Lecture lecture, long fileNo) {
-        genFileService.remove(lecture.getModelName(), lecture.getId(), "common", "attachment", fileNo);
+        genFileService.remove(lecture.getModelName(), lecture.getId(), "templates/common", "attachment", fileNo);
     }
 
     private List<GenFile> findGenFiles(Lecture lecture) {

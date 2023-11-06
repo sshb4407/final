@@ -1,0 +1,257 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|강의 생성|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <th:block th:replace="common/fragments :: toastuiEidtorLib"></th:block>
+
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|강의 생성|"></span>
+        </h1>
+
+        <button class="btn btn-sm btn-outline my-4 addBlockButton">수업 추가</button>
+
+        <form id="myForm" class="flex flex-col gap-6" enctype="multipart/form-data" method="POST"
+              onsubmit="submitWriteForm(this); return false;"
+              th:action>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">수업 1 제목</span>
+                </label>
+                <input class="input input-bordered" maxlength="100"
+                       name="subjects" placeholder="제목" type="text" autofocus>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">수업 1 영상</span>
+                </label>
+                <input class="file-input file-input-bordered"
+                       name="videos"
+                       type="file">
+            </div>
+
+            <button type="button" id="last" class="btn btn-sm btn-outline my-4 w-20 addBlockButton">수업 추가</button>
+
+            <div class="flex flex-col gap-2">
+                <button class="btn btn-block btn-primary gap-1">
+                    <i class="fa-solid fa-pen"></i>
+                    <span>강의 등록</span>
+                </button>
+
+                <div class="text-center">
+                    <a class="btn btn-link" href="/templates/usr/lecture/list">목록으로</a>
+                </div>
+            </div>
+
+        </form>
+
+        <div id="loadingOverlay" style="display:none;"
+             class="fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 z-50">
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-20">
+
+                <p>동영상이 업로드 중 입니다. 잠시만 기다려주세요.</p>
+
+                <br>
+
+                <progress class="progress" style="width:360px;"></progress>
+
+                <br>
+
+                <ul class="mt-4 list-disc mx-5 text-gray-400 ">
+                    <li>
+                        동영상 업로드가 완료되면 페이지가 이동 됩니다.
+                    </li>
+                    <li>
+                        동영상의 양에 따라 몇 분의 시간이 걸릴 수 있습니다.
+                    </li>
+
+                    <br>
+
+                    <li>
+                        업로드가 완료되면 동영상의 변환작업이 시작됩니다.
+                    </li>
+                    <li>
+                        동영상 변환이 진행되는 동안은 작성을 완료한 커리큘럼이라도 노출이 되지 않습니다.
+                    </li>
+                    <li>
+                        동영상 변환이 완료되면 작성하신 커리큘럼을 확인하실 수 있습니다.
+                    </li>
+
+
+                </ul>
+
+
+            </div>
+        </div>
+
+        <script>
+            let submitWriteFormDone = false;
+
+            function submitWriteForm(form) {
+
+                if (submitWriteFormDone) return;
+
+                let subjects = form.elements.namedItem("subjects");
+                let videos = form.elements.namedItem("videos");
+
+                if (!subjects.length) {
+                    subjects = [subjects];
+                }
+
+                for (let i = 0; i < subjects.length; i++) {
+                    subjects[i].value = subjects[i].value.trim();
+
+                    if (subjects[i].value.length == 0) {
+                        subjects[i].focus();
+                        toastWarning('제목을 입력해주세요.');
+                        return;
+                    }
+
+                    if (subjects[i].value.length < 2) {
+                        subjects[i].focus();
+                        toastWarning('제목을 2자 이상 입력해주세요.');
+                        return;
+                    }
+                }
+
+                if (!videos.length) {
+                    videos = [videos];
+                }
+
+                for (let i = 0; i < videos.length; i++) {
+                    let fileInput = videos[i];
+
+                    if (!fileInput) break;
+
+                    if (fileInput.files.length == 0) {
+                        fileInput.focus();
+                        toastWarning('수업 영상 ' + (i+1) + '를 선택해주세요.');
+                        return;
+                    }
+
+                    if (fileInput.files.length > 0 && fileInput.files[0].size === 0) {
+                        fileInput.focus();
+                        toastWarning('수업 영상 ' + (i+1) + '의 용량이 0 입니다. 다른 파일을 선택해주세요.');
+                        return;
+                    }
+                }
+
+                function showLoadingOverlay() {
+                    document.getElementById('loadingOverlay').style.display = 'block';
+                }
+
+                // "비디오 업로드 중..." 알림 표시 (여기서는 단순한 alert를 사용했으나, 실제로는 보다 나은 UX를 위한 로딩 애니메이션 등을 사용할 수 있습니다.)
+                showLoadingOverlay();
+
+                // FormData 객체를 사용하여 form의 데이터를 가져옵니다.
+                let formData = new FormData(form);
+
+                // fetch를 사용하여 비동기 요청을 보냅니다.
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json()) // 응답을 JSON 형태로 파싱합니다.
+                .then(rs => {
+                    // 요청 성공 시 수행할 로직 (예: 페이지 리디렉션)
+                    if (rs.success) {
+                        let lectureId = rs.data;
+                        setTimeout(() => {
+                            window.location.href = `/usr/lecture/detail/${lectureId}`;
+                        }, 5000);
+                    }
+                })
+
+                submitWriteFormDone = true;
+            }
+        </script>
+
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                const addButtons = document.querySelectorAll('.addBlockButton');
+                const formElement = document.getElementById('myForm');
+
+                addButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        addBlock();
+                    });
+                });
+            });
+
+            function addBlock() {
+                const formElement = document.getElementById('myForm');
+                const container = document.createElement('div');
+                const blockCount = formElement.querySelectorAll('.form-control').length / 2 + 1; // 각 수업에는 두 개의 .form-control이 있으므로 2로 나눔
+
+                const blockHtml = `
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">수업 <span>${blockCount}</span><span> 제목</span></span>
+                            <button type="button" class="btn btn-square btn-outline w-[40px]" onclick="removeElements(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </label>
+                        <input class="input input-bordered" maxlength="100" name="subjects" placeholder="제목" type="text" autofocus>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">수업 <span>${blockCount}</span><span> 영상</span></span>
+                        </label>
+                        <input class="file-input file-input-bordered" name="videos" type="file">
+                    </div>
+                `;
+
+                container.innerHTML = blockHtml;
+                let referenceElement = document.getElementById('last');
+                formElement.insertBefore(container, referenceElement);
+
+                // 번호 재정렬
+                reorderBlocks();
+            }
+
+            function removeElements(btn) {
+                // 버튼이 속한 container div 찾기 (더 상위의 div)
+                let containerDiv = btn.closest('.form-control').parentNode;
+
+                // container div 제거
+                containerDiv.remove();
+
+                // 번호 재정렬
+                reorderBlocks();
+            }
+
+            function reorderBlocks() {
+                const formElement = document.getElementById('myForm');
+                const blocks = formElement.querySelectorAll('.form-control');
+                let blockCount = 1; // 기본 블록의 시작 번호는 2이므로, 1로 초기화합니다.
+
+                blocks.forEach((block, index) => {
+                    const numberSpan = block.querySelector('label .label-text span');
+                    if (numberSpan) {
+                        if (index % 2 == 0) { // 각 블록 묶음의 첫 번째 블록에만 번호를 부여합니다.
+                            blockCount++;
+                        }
+                        numberSpan.textContent = blockCount;
+                    }
+                });
+            }
+        </script>
+
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/usr/genFile")
+@RequestMapping("/templates/usr/genFile")
 @Validated
 public class GenFileController {
     private final Rq rq;

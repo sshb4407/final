@@ -1,0 +1,492 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|강의 - ${lecture.subject}|"></title>
+    <style>
+
+        @media (max-width: 767px) {
+            body:after {
+                content: 'mobile';
+                display: none;
+                visibility: hidden;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-regular fa-file-word"></i>
+            <span th:text="|${lecture.subject} 대시보드|"></span>
+        </h1>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">강의번호</span>
+                        </label>
+                        <div th:text="${lecture.id}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">등록일</span>
+                        </label>
+                        <div th:text="${#temporals.format(lecture.createDate, 'yy.MM.dd')}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">강사명</span>
+                        </label>
+                        <div th:text="${lecture.producer.producerName}"></div>
+                    </div>
+
+                    <div th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
+                         class="form-control">
+                        <label class="label">
+                            <span class="label-text">상태</span>
+                        </label>
+                        <div th:text="${lecture.publicHanName}"></div>
+                    </div>
+
+                    <div class="form-control col-span-full">
+                        <label class="label">
+                            <span class="label-text">제목</span>
+                        </label>
+                        <div th:text="${lecture.subject}"></div>
+                    </div>
+
+                    <div class="form-control col-span-full">
+                        <label class="label">
+                            <span class="label-text">태그</span>
+                        </label>
+                        <div th:utext="${lecture.getTagLinks('<a class=`link` href=`%s`>#%s</a>', '/usr/article/listByTag/%s')}"></div>
+                    </div>
+
+                    <div class="form-control col-span-full">
+                        <label class="label">
+                            <span class="label-text">내용</span>
+                        </label>
+                        <div class="toastui-editor-contents"
+                             style="overflow-wrap: break-word;"
+                             th:utext="${lecture.bodyHtmlForPrint}">
+                        </div>
+                    </div>
+
+                    <div class="form-control col-span-full" th:each="fileEntry : ${filesMap}">
+                        <label class="label">
+                            <span class="label-text">강의자료 <span th:text="${fileEntry.key}"></span></span>
+                        </label>
+
+                        <a th:href="|${fileEntry.value.downloadUrl}|" class="link">
+                            <i class="fa-regular fa-file"></i>
+                            강의자료
+                            <span th:text="${fileEntry.key}"></span>
+                            (<span th:text="${fileEntry.value.originFileName}"></span>)
+                            다운로드
+                        </a>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <div class="text-center">
+                        <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
+                           class="btn btn-link"
+                           th:href="|/usr/lecture/modify/${lecture.id}|">수정</a>
+                        <a onclick="return confirm('정말로 삭제하시겠습니까?');"
+                           th:if="${@lectureService.checkProducerCanRemove(@rq.member, lecture).success}"
+                           class="btn btn-link"
+                           th:href="|/usr/lecture/remove/${lecture.id}|" method="POST">삭제</a>
+                        <a class="btn btn-link" th:href="|/usr/lecture/list|">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <h1 class="my-4">
+            <i class="fa-regular fa-file-word"></i>
+            <span th:text="|${lecture.subject} 커리큘럼 수정|"></span>
+        </h1>
+
+        <div class="card bg-base-100 shadow-xl " >
+            <div class="card-body">
+                <div class="detail grid grid-rows-[repeat(auto-fit,minmax(70px,1fr))] gap-3">
+
+                    <div class="flex justify-end">
+                        <a th:href="|/usr/lesson/${lecture.id}/modifySortNo|" class="modifySortNoTag btn btn-sm btn-outline btn-primary">커리큘럼 순서 바꾸기</a>
+                    </div>
+
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const isMobile = getComputedStyle(document.body, ':after').getPropertyValue('content') === '"mobile"';
+
+                            document.querySelector(".modifySortNoTag").addEventListener("click", function(e) {
+                                if (isMobile) {
+                                    e.preventDefault();
+                                    rejectMobile(); // 원하는 함수를 호출
+                                }
+                            });
+                        });
+
+                        function rejectMobile() {
+                            toastWarning('모바일 환경에서는 지원하지 않습니다.');
+                        }
+                    </script>
+
+                    <div th:each="lesson : ${lessons}" class="text-left my-2 flex">
+                        <span class="btn btn-active btn-neutral flex-none mr-2 -ml-4" th:text="|${lesson.sortNo} 강 |"></span>
+                        <button type="button" class="btn btn-primary flex-grow max-w-[160px] mr-2 "
+                                th:attr="onclick=${lesson.lessonReady} ? 'modifyFormModal'+${lesson.id}+'.showModal()'
+                                 : 'toastWarning(\'해당 수업은 동영상 변환 작업중 입니다. 현재 수정이 불가능합니다.\')'"
+                                th:text="${lesson.subject}">
+                        </button>
+                        <span class="btn btn-active btn-neutral flex-none mr-2" th:text="${lesson.lessonLengthForPrint}"></span>
+
+                        <dialog th:id="'modifyFormModal' + ${lesson.id}" class="modal">
+                            <form class="modal-box" method="POST" enctype="multipart/form-data"
+                                  onsubmit="submitModifyForm(this); return false;"
+                                  th:action="|/usr/lesson/${lecture.id}/modify|">
+                                <div class="form-control col-span-full">
+                                    <label class="label">
+                                        <span class="label-text">수업 제목 변경</span>
+                                    </label>
+
+                                    <div class="flex items-center">
+                                        <input class="input input-bordered w-full" maxlength="100"
+                                               name="subject" placeholder="제목" type="text" th:value="${lesson.subject}"
+                                               th:data-original="${lesson.subject}">
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="lessonId" th:value="${lesson.id}">
+
+                                <ul class="mt-16 list-disc mx-5 text-gray-400">
+                                    <li>
+                                        강의 영상 변경을 위해 체크와 파일선택이 동시에 이루어져야 합니다.
+                                    </li>
+                                    <li>
+                                        파일선택시 취소를 선택하면 파일선택을 리셋할 수 있습니다.
+                                    </li>
+                                </ul>
+                                <div class="form-control col-span-full">
+                                    <label class="label">
+                                        <span class="label-text">기존 강의영상 삭제</span>
+                                    </label>
+
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" class="checkbox" name="videoRemove" value="true">
+
+                                    </div>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">새 강의영상 </span>
+                                    </label>
+                                    <input class="file-input file-input-bordered"
+                                           name="video"
+                                           type="file">
+                                </div>
+
+                                <div class="flex flex-row justify-between mt-12">
+                                    <form method="dialog">
+                                        <button type="button" class="btn btn-error" onclick="closeAndReset(this);">취소</button>
+                                    </form>
+
+                                    <div class="flex flex-row">
+                                        <a onclick="return confirm('해당 수업을 정말로 삭제하시겠습니까?');"
+                                           th:href="|/usr/lesson/${lecture.id}/remove/${lesson.id}|"
+                                           class="btn btn-error mx-2" method="POST">삭제</a>
+                                        <button type="submit" class="btn btn-primary mx-2">저장</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </dialog>
+
+                        <div id="loadingOverlay" style="display:none;" class="fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 z-50">
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-20">
+
+                                <p>동영상이 업로드 중 입니다. 잠시만 기다려주세요.</p>
+
+                                <br>
+
+                                <progress class="progress" style="width:360px;"></progress>
+
+                                <br>
+
+                                <ul class="mt-4 list-disc mx-5 text-gray-400">
+                                    <li>
+                                        동영상 업로드가 완료되면 페이지가 이동 됩니다.
+                                    </li>
+                                    <li>
+                                        동영상의 양에 따라 몇 분의 시간이 걸릴 수 있습니다.
+                                    </li>
+
+                                    <br>
+
+                                    <li>
+                                        업로드가 완료되면 동영상의 변환작업이 시작됩니다.
+                                    </li>
+                                    <li>
+                                        동영상 변환이 진행되는 동안은 작성을 완료한 커리큘럼이라도 노출이 되지 않습니다.
+                                    </li>
+                                    <li>
+                                        동영상 변환이 완료되면 작성하신 커리큘럼을 확인하실 수 있습니다.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <script>
+
+                            function closeAndReset(buttonElement) {
+                                // 현재 다이얼로그를 닫음
+                                buttonElement.closest('dialog').close();
+
+                                // 현재 다이얼로그 내의 모든 input 요소의 값을 리셋
+                                let dialog = buttonElement.closest('dialog');
+                                let inputs = dialog.querySelectorAll('input:not([name=subject])'); // subject를 제외한 input
+                                inputs.forEach(input => {
+                                    input.value = '';
+                                    if(input.type === 'checkbox') {
+                                        input.checked = false;
+                                    }
+                                });
+
+                                // subject 입력값을 원래 값으로 되돌림
+                                let subjectInput = dialog.querySelector('input[name=subject]');
+                                if(subjectInput) {
+                                    subjectInput.value = subjectInput.dataset.original;
+                                }
+
+                                // 현재 button 이 속한 dialog 의 형제 ul 의 클래스에 hidden 추가
+                                let ulElement = dialog.nextElementSibling;
+                                    if (ulElement && ulElement.tagName === 'UL') {
+                                        ulElement.classList.add('hidden');
+                                    }
+                            }
+
+
+                            let submitModifyFormDone = false;
+
+                            function submitModifyForm(form) {
+
+                                form.parentElement.close();
+
+                                if (submitModifyFormDone) return;
+
+                                form.subject.value = form.subject.value.trim();
+
+                                if (form.subject.value.length == 0) {
+                                    form.subject.focus();
+                                    toastWarning('제목을 입력해주세요.');
+                                    return;
+                                }
+
+                                if (form.subject.value.length < 2) {
+                                    form.subject.focus();
+                                    toastWarning('제목을 2자 이상 입력해주세요.');
+                                    return;
+                                }
+
+
+                                // 체크박스와 파일 입력 필드의 상태를 가져옴
+                                let checkbox = form.querySelector('input[name="videoRemove"]');
+                                let fileInput = form.querySelector('input[name="video"]');
+
+                                // 체크박스가 체크된 상태인데 파일이 선택되지 않았을 경우
+                                     if ((checkbox.checked && !fileInput.files.length) || (!checkbox.checked && fileInput.files.length)) {
+                                    toastWarning('영상 변경 요청이 올바르지 않습니다. 삭제 체크와 파일 선택이 올바르게 선택되었는지 확인해주세요.');
+                                    return false;
+                                }
+
+                                function showLoadingOverlay() {
+                                    document.getElementById('loadingOverlay').style.display = 'block';
+                                }
+
+                                // "비디오 업로드 중..." 알림 표시 (여기서는 단순한 alert를 사용했으나, 실제로는 보다 나은 UX를 위한 로딩 애니메이션 등을 사용할 수 있습니다.)
+                                showLoadingOverlay();
+
+                                // FormData 객체를 사용하여 form의 데이터를 가져옵니다.
+                                let formData = new FormData(form);
+
+                                // fetch를 사용하여 비동기 요청을 보냅니다.
+                                fetch(form.action, {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(res => res.json()) // 응답을 JSON 형태로 파싱합니다.
+                                .then(rs => {
+                                    // 요청 성공 시 수행할 로직 (예: 페이지 리디렉션)
+                                    if (rs.success) {
+                                        let lectureId = rs.data;
+                                        setTimeout(() => {
+                                            window.location.href = `/usr/lesson/${lectureId}/modify?msg=${encodeURIComponent(lectureId + '번 강의가 수정되었습니다.')}&ttl=1698804504756`
+                                        }, 5000);
+                                    }
+                                })
+
+                                submitModifyFormDone = true;
+                            }
+                        </script>
+
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button class="btn btn-sm btn-outline my-4 addBlockButton max-w-[100px]" onclick="my_modal_1.showModal()">수업 추가</button>
+                    <dialog id="my_modal_1" class="modal">
+                        <form class="modal-box" method="POST" enctype="multipart/form-data"
+                              onsubmit="submitWriteAddLessonForm(this); return false;"
+                              th:action="|/usr/lesson/${lecture.id}/writeAddLesson|">
+                            <div class="form-control col-span-full">
+                                <label class="label">
+                                    <span class="label-text">수업 제목</span>
+                                </label>
+
+                                <div class="flex items-center">
+                                    <input class="input input-bordered w-full" maxlength="100"
+                                           name="subject" placeholder="제목">
+                                </div>
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">강의영상 </span>
+                                </label>
+                                <input class="file-input file-input-bordered"
+                                       name="video"
+                                       type="file">
+                            </div>
+
+                            <div class="flex flex-row justify-between mt-12">
+                                <form method="dialog">
+                                    <button type="button" class="btn btn-error" onclick="closeAndClean(this);">취소</button>
+                                </form>
+
+                                <div class="flex flex-row">
+                                    <button type="submit" class="btn btn-primary mx-2">저장</button>
+                                </div>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <script>
+
+                        function closeAndClean(buttonElement) {
+                            // 현재 다이얼로그를 닫음
+                            buttonElement.closest('dialog').close();
+
+                            // 현재 다이얼로그 내의 모든 input 요소의 값을 리셋
+                            let dialog = buttonElement.closest('dialog');
+                            let inputs = dialog.querySelectorAll('input:not([name=subject])'); // subject를 제외한 input
+                            inputs.forEach(input => {
+                                input.value = '';
+                                if(input.type === 'checkbox') {
+                                    input.checked = false;
+                                }
+                            });
+
+                            let subjectInput = dialog.querySelector('input[name=subject]');
+                            if(subjectInput && subjectInput.value) {
+                                subjectInput.value = '';
+                            }
+
+                            // 현재 button 이 속한 dialog 의 형제 ul 의 클래스에 hidden 추가
+                            let ulElement = dialog.nextElementSibling;
+                                if (ulElement && ulElement.tagName === 'UL') {
+                                    ulElement.classList.add('hidden');
+                                }
+                        }
+
+
+
+                        let submitWriteAddLessonFormDone = false;
+
+                        function submitWriteAddLessonForm(form) {
+                            form.parentElement.close();
+
+                            if (submitWriteAddLessonFormDone) return;
+
+                            form.subject.value = form.subject.value.trim();
+
+                            if (form.subject.value.length == 0) {
+                                form.parentElement.close();
+                                toastWarning('제목을 입력해주세요.');
+                                return;
+                            }
+
+                            if (form.subject.value.length < 2) {
+                                form.parentElement.close();
+                                toastWarning('제목을 2자 이상 입력해주세요.');
+                                return;
+                            }
+
+                            var fileInput = form.video;
+
+                            if (!fileInput.files || fileInput.files.length == 0) {
+                                toastWarning('강의영상을 선택해주세요.');
+                                return;
+                            }
+
+                            function showLoadingOverlay() {
+                                document.getElementById('loadingOverlay').style.display = 'block';
+                            }
+
+                            showLoadingOverlay();
+
+                            // FormData 객체를 사용하여 form의 데이터를 가져옵니다.
+                            let formData = new FormData(form);
+
+                            // fetch를 사용하여 비동기 요청을 보냅니다.
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json()) // 응답을 JSON 형태로 파싱합니다.
+                            .then(rs => {
+                                // 요청 성공 시 수행할 로직 (예: 페이지 리디렉션)
+                                if (rs.success) {
+                                    let lectureId = rs.data;
+                                    setTimeout(() => {
+                                        window.location.href = `/usr/lesson/${lectureId}/modify?msg=${encodeURIComponent(lectureId + '번 강의가 수정되었습니다.')}&ttl=1698804504756`
+                                    }, 5000);
+                                }
+                            })
+
+                            submitWriteAddLessonFormDone = true;
+                        }
+                    </script>
+
+
+
+
+                </div>
+
+                <div class="">
+                    <div class="text-center">
+                        <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
+                           class="btn btn-link"
+                           th:href="|/usr/lecture/detail/${lecture.id}|">수정 완료</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

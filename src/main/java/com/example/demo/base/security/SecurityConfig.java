@@ -1,6 +1,5 @@
 package com.example.demo.base.security;
 
-import jakarta.servlet.annotation.WebListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -10,15 +9,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultHttpSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 @Configuration
@@ -43,37 +39,37 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests
-                                .requestMatchers(requestMatchersOf("/usr/member/notVerified")
+                                .requestMatchers(requestMatchersOf("/templates/usr/member/notVerified")
                                 ).permitAll()
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/post/modify/*")
+                                        requestMatchersOf("/templates/usr/post/modify/*")
                                 ).access(accessOf("@postController.assertActorCanModify()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/post/remove/*")
+                                        requestMatchersOf("/templates/usr/post/remove/*")
                                 ).access(accessOf("@postController.assertActorCanRemove()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/article/*/write")
+                                        requestMatchersOf("/templates/usr/article/*/write")
                                 ).access(accessOf("@articleController.assertActorCanWrite()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/article/*/modify/*")
+                                        requestMatchersOf("/templates/usr/article/*/modify/*")
                                 ).access(accessOf("@articleController.assertActorCanModify()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/article/*/remove/*")
+                                        requestMatchersOf("/templates/usr/article/*/remove/*")
                                 ).access(accessOf("@articleController.assertActorCanRemove()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/book/*/write")
+                                        requestMatchersOf("/templates/usr/book/*/write")
                                 ).access(accessOf("@bookController.assertActorCanWrite()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/book/*/modify/*")
+                                        requestMatchersOf("/templates/usr/book/*/modify/*")
                                 ).access(accessOf("@bookController.assertActorCanModify()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/book/*/remove/*")
+                                        requestMatchersOf("/templates/usr/book/*/remove/*")
                                 ).access(accessOf("@bookController.assertActorCanRemove()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/usr/member/beProducer", "/usr/member/modify")
+                                        requestMatchersOf("/templates/usr/member/beProducer", "/templates/usr/member/modify")
                                 ).access(accessOf("@memberController.assertCheckPasswordAuthCodeVerified()"))
                                 .requestMatchers(
-                                        requestMatchersOf("/", "/usr/**")
+                                        requestMatchersOf("/", "/templates/usr/**")
                                 ).access(accessOf("isAnonymous() or @memberController.assertCurrentMemberVerified()"))
                                 .requestMatchers(
                                         requestMatchersOf("/adm/**")
@@ -87,7 +83,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(
                         oauth2Login -> oauth2Login
-                                .loginPage("/usr/member/login")
+                                .loginPage("/templates/usr/member/login")
                 )
                 .csrf((csrf) -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
@@ -95,12 +91,12 @@ public class SecurityConfig {
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 .formLogin((formLogin) -> formLogin
-                        .loginPage("/usr/member/login")
+                        .loginPage("/templates/usr/member/login")
                         .successHandler(new CustomSimpleUrlAuthenticationSuccessHandler())
                         .failureHandler(new CustomSimpleUrlAuthenticationFailureHandler())
                 )
                 .logout((logout) -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/usr/member/logout"))
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/templates/usr/member/logout"))
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true))
         ;

@@ -58,7 +58,7 @@ public class MemberService {
 
     public Optional<String> findProfileImgUrl(Member member) {
         return genFileService.findBy(
-                        member.getModelName(), member.getId(), "common", "profileImg", 1
+                        member.getModelName(), member.getId(), "templates/common", "profileImg", 1
                 )
                 .map(GenFile::getUrl);
     }
@@ -158,7 +158,7 @@ public class MemberService {
     private void saveProfileImg(Member member, String profileImgFilePath) {
         if (Ut.str.isBlank(profileImgFilePath)) return;
 
-        genFileService.save(member.getModelName(), member.getId(), "common", "profileImg", 1, profileImgFilePath);
+        genFileService.save(member.getModelName(), member.getId(), "templates/common", "profileImg", 1, profileImgFilePath);
     }
 
     private void sendJoinCompleteEmail(Member member) {

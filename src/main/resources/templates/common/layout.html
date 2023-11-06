@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html
+        lang="ko"
+        th:with="UtThy=${T(com.yk.Motivation.standard.util.Ut.thy)}"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE" th:text="모티베이션"></title>
+
+    <!-- 제이쿼리 불러오기 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- toastr 불러오기 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <link href="https://jhs512.github.io/toastr/toastr.css" rel="stylesheet">
+
+    <!-- 폰트어썸 아이콘 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- 아이콘 목록 : https://fontawesome.com/search?o=r&m=free -->
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@3.7.7/dist/full.css" rel="stylesheet" type="text/css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="/resource/common/common.css" rel="stylesheet">
+<script src="/resource/common/common.js"></script>
+
+<div class="min-h-screen flex flex-col">
+    <header layout:fragment="header" class="sticky top-0 z-50 shadow-sm"></header>
+
+
+    <main class="flex-1 flex flex-col py-4">
+        <th:block layout:fragment="content"></th:block>
+    </main>
+</div>
+
+<script>
+    // URL에서 msg 파라미터의 값을 가져오는 함수
+    function getMsgFromURL() {
+        const url = new URL(window.location.href);
+        return url.searchParams.get('msg');
+    }
+
+    function getFailMsgFromURL() {
+        const url = new URL(window.location.href);
+        return url.searchParams.get('failMsg');
+    }
+
+    const msg = getMsgFromURL();
+
+    // msg 파라미터의 값이 있으면 toastr로 알림을 표시
+    if (msg) {
+        toastNotice(decodeURIComponent(msg));
+    }
+
+    const failMsg = getFailMsgFromURL();
+
+    // msg 파라미터의 값이 있으면 toastr로 알림을 표시
+    if (failMsg) {
+        toastWarning(decodeURIComponent(failMsg));
+    }
+
+    // history.back 에 의해서 돌아온 경우에 실행됨
+    $(window).bind("pageshow", function (event) {
+        let localStorageKeyAboutHistoryBackFailMsg = "historyBackFailMsg___" + location.href;
+
+        if (!localStorage.getItem(localStorageKeyAboutHistoryBackFailMsg)) {
+            localStorageKeyAboutHistoryBackFailMsg = "historyBackFailMsg___null";
+        }
+
+        const historyBackFailMsg = localStorage.getItem(localStorageKeyAboutHistoryBackFailMsg);
+        if (historyBackFailMsg) {
+            toastWarning(historyBackFailMsg);
+            localStorage.removeItem(localStorageKeyAboutHistoryBackFailMsg);
+        }
+    });
+
+</script>
+
+</body>
+</html>

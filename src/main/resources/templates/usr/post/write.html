@@ -1,0 +1,181 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|글쓰기|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <th:block th:replace="common/fragments :: toastuiEidtorLib"></th:block>
+
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|글쓰기|"></span>
+        </h1>
+
+        <form class="flex flex-col gap-6" enctype="multipart/form-data" method="POST"
+              onsubmit="submitWriteForm(this); return false;"
+              th:action>
+            <input type="hidden" name="body">
+            <input type="hidden" name="bodyHtml">
+
+            <div class="form-control">
+                <label class="cursor-pointer label">
+                    <span class="label-text">공개여부</span>
+                </label>
+
+                <input type="checkbox" name="public" value="true" class="toggle toggle-primary">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">제목</span>
+                </label>
+                <input class="input input-bordered" maxlength="100"
+                       name="subject" placeholder="제목" type="text" autofocus>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">태그</span>
+                </label>
+                <input class="input input-bordered" maxlength="100"
+                       name="tagsStr"
+                       placeholder="`#자바 #HTML[5] #알고리즘 ...`          ※ 숫자 `[5]` 설명 : `5`는 전체 `알고리즘` 글들 중에서 이 글의 순서번호(조절가능, 입력안하면 순서번호는 자동으로 부여됨)"
+                       type="text">
+                <ul th:fragment="postTagInputDesc" class="mt-4 list-disc mx-5 text-gray-400">
+                    <li>
+                        입력예시 : <span class="text-red-400">#자바 #HTML #알고리즘[3] #...</span>
+                    </li>
+                    <li>
+                        하나의 <span class="text-red-400">글</span>은 여러개의 <span class="text-red-400">태그</span>들을 가질 수 있습니다.
+                    </li>
+                    <li>
+                        하나의 <span class="text-red-400">태그</span>는 여러개의 <span class="text-red-400">글</span>들이 공유할 수 있습니다.
+                    </li>
+                    <li>
+                        각 태그들의 구분자는 <span class="text-red-400">#</span> 입니다.
+                    </li>
+                    <li>
+                        하나의 <span class="text-red-400">태그</span>로 묶인 <span class="text-red-400">글들</span>을 <span
+                            class="text-red-400">시리즈</span> 라고 합니다.
+                    </li>
+                    <li>
+                        예를들어 내가 작성한 <span class="text-red-400">모든 글들</span> 중에서 <span class="text-red-400">알고리즘</span>이라는
+                        <span class="text-red-400">태그</span>가 등록된 글들을 <span class="text-red-400">알고리즘 시리즈</span> 라고 합니다.
+                    </li>
+                    <li>
+                        각 <span class="text-red-400">시리즈</span>에 속한 <span class="text-red-400">글들</span>은 자동으로 순서대로
+                        <span class="text-red-400">순서번호</span>가 매겨집니다.(첫 번호는 1)
+                    </li>
+                    <li>
+                        <span class="text-red-400">#자바</span> 와 같은 식으로 <span class="text-red-400">[숫자]</span>를 뒤에 붙이지
+                        않으면 자동으로 이 글은 <span class="text-red-400">자바 시리즈</span> 의 가장 마지막 글로 등록됩니다.
+                    </li>
+                    <li>
+                        <span class="text-red-400">#알고리즘[3]</span> 와 같은 식으로 입력하면 이 글은 <span class="text-red-400">알고리즘 시리즈</span>
+                        의 <span class="text-red-400">3번째</span> 글로 등록됩니다.(이런식으로 순서조절 가능)
+                    </li>
+                    <li>
+                        글 수정화면에서는 <span class="text-red-400">#알고리즘[3/5]</span> 에서 처럼 뒤에 <span
+                            class="text-red-400">숫자 5</span>가 나온는데(참고로 <span class="text-red-400">숫자 3</span>은 순서번호)
+                    </li>
+                    <li>
+                        그것(<span class="text-red-400">숫자 5</span>)은 <span class="text-red-400">알고리즘 시리즈</span>를 구성하는 모든
+                        글의 <span class="text-red-400">개수</span> 입니다.(수정 불가능, 표시용 정보)
+                    </li>
+                </ul>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">내용</span>
+                </label>
+
+                <div class="toast-ui-editor" height="calc(100vh - 200px)" placeholder="내용"></div>
+            </div>
+
+            <div th:each="i : ${#numbers.sequence(1, 2)}" class="form-control">
+                <label class="label">
+                    <span class="label-text">첨부파일 <span th:text="${i}"></span></span>
+                </label>
+                <input class="file-input file-input-bordered"
+                       th:name="'attachment__' + ${i}"
+                       type="file">
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <button class="btn btn-block btn-primary gap-1">
+                    <i class="fa-solid fa-pen"></i>
+                    <span>글쓰기</span>
+                </button>
+
+                <div class="text-center">
+                    <a th:with="listUrl = ${param.listUrl != null ? param.listUrl : '/usr/post/list'}"
+                       class="btn btn-link" th:href="${listUrl}">목록</a>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            let submitWriteFormDone = false;
+
+            function submitWriteForm(form) {
+                if (submitWriteFormDone) return;
+
+                form.subject.value = form.subject.value.trim();
+
+                if (form.subject.value.length == 0) {
+                    form.subject.focus();
+                    toastWarning('제목을 입력해주세요.');
+                    return;
+                }
+
+                if (form.subject.value.length < 2) {
+                    form.subject.focus();
+                    toastWarning('제목을 2자 이상 입력해주세요.');
+                    return;
+                }
+
+                const editor = $(form).find(".toast-ui-editor").data("data-toast-editor");
+
+                const markdown = editor.getMarkdown().trim();
+                const html = editor.getHTML().trim();
+
+                form.body.value = markdown;
+                form.bodyHtml.value = html;
+
+                if (form.body.value.length == 0 || form.bodyHtml.value.length == 0) {
+                    toastWarning("내용을 입력해주세요");
+                    editor.focus();
+                    return;
+                }
+
+                // 파일 입력 필드의 인덱스 시작
+                for (let i = 1; true; i++) {
+                    const fileInput = form['attachment__' + i];
+
+                    // 해당 이름의 입력 필드가 없으면 반복문 종료
+                    if (!fileInput) break;
+
+                    if (fileInput.files.length > 0 && fileInput.files[0].size === 0) {
+                        fileInput.focus();
+                        toastWarning('첨부파일 ' + i + '의 용량이 0 입니다. 다른 파일을 선택해주세요.');
+                        return;
+                    }
+
+                    i++;
+                }
+
+                form.submit();
+                submitWriteFormDone = true;
+            }
+        </script>
+    </div>
+</div>
+
+</body>
+
+</html>

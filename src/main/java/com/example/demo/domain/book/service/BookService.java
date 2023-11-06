@@ -106,14 +106,14 @@ public class BookService {
 
     @Transactional
     public RsData<GenFile> saveAttachmentFile(Book book, String attachmentFile, long fileNo) {
-        GenFile genFile = genFileService.save(book.getModelName(), book.getId(), "common", "attachment", fileNo, attachmentFile);
+        GenFile genFile = genFileService.save(book.getModelName(), book.getId(), "templates/common", "attachment", fileNo, attachmentFile);
 
         return new RsData<>("S-1", genFile.getId() + "번 파일이 생성되었습니다.", genFile);
     }
 
     @Transactional
     public void removeAttachmentFile(Book book, long fileNo) {
-        genFileService.remove(book.getModelName(), book.getId(), "common", "attachment", fileNo);
+        genFileService.remove(book.getModelName(), book.getId(), "templates/common", "attachment", fileNo);
     }
 
     public Page<Book> findByTag(String tagContent, Pageable pageable) {

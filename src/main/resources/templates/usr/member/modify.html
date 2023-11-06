@@ -1,0 +1,146 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title>회원정보수정</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="max-w-2xl w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-user-pen"></i>
+            회원정보수정
+        </h1>
+
+        <form class="flex flex-col gap-6" enctype="multipart/form-data" method="POST" name="modify-form"
+              onsubmit="submitModifyForm(this); return false;"
+              th:action>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">기존 프로필 이미지</span>
+                </label>
+                <div class="flex justify-center">
+                    <img class="w-40 h-40 rounded-full" th:src="${@rq.profileImgUrl}">
+                </div>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">새 프로필 이미지</span>
+                </label>
+                <input accept="image/jpeg, image/png, image/gif" class="file-input file-input-bordered"
+                       name="profileImg"
+                       type="file">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">아이디</span>
+                </label>
+                <div class="badge badge-lg badge-ghost" th:text="${@rq.member.username}"></div>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">새 비밀번호</span>
+                </label>
+                <input class="input input-bordered" maxlength="30" name="password" placeholder="새 비밀번호" type="password">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">새 비밀번호 확인</span>
+                </label>
+                <input class="input input-bordered" maxlength="30" name="passwordConfirm" placeholder="새 비밀번호 확인"
+                       type="password">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">별명</span>
+                </label>
+                <input class="input input-bordered" maxlength="30" name="nickname" placeholder="별명"
+                       th:value="${@rq.member.nickname}" type="text">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">이메일</span>
+                </label>
+                <div class="badge badge-lg badge-ghost" th:text="${@rq.member.email}"></div>
+            </div>
+
+            <div>
+                <button class="btn btn-block btn-primary gap-1">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span>회원정보수정</span>
+                </button>
+
+                <div class="text-center">
+                    <a class="btn btn-link" href="/templates/usr/member/me">내 정보</a>
+                    <a class="btn btn-link" href="/templates/usr/member/logout">로그아웃</a>
+                    <a class="btn btn-link" href="/templates/usr/member/withdrawal">회원탈퇴</a>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            const modifyForm = document['modify-form'];
+
+            let submitModifyFormDone = false;
+            function submitModifyForm(form) {
+                if ( submitModifyFormDone ) return;
+
+                form.password.value = form.password.value.trim();
+
+                if ( form.password.value.length > 0 ) {
+
+                    if ( form.password.value.length < 4 ) {
+                        form.password.focus();
+                        toastWarning('새 비밀번호를 4자 이상 입력해주세요.');
+                        return;
+                    }
+
+                    form.passwordConfirm.value = form.passwordConfirm.value.trim();
+
+                    if ( form.passwordConfirm.value.length == 0 ) {
+                        form.passwordConfirm.focus();
+                        toastWarning('새 비밀번호를 확인을 입력해주세요.');
+                        return;
+                    }
+
+                    if ( form.password.value != form.passwordConfirm.value ) {
+                        form.passwordConfirm.focus();
+                        toastWarning('새 비밀번호를 확인이 일치하지 않습니다.');
+                        return;
+                    }
+                }
+
+                form.nickname.value = form.nickname.value.trim();
+
+                if ( form.nickname.value.length == 0 ) {
+                    form.nickname.focus();
+                    toastWarning('별명을 입력해주세요.');
+                    return;
+                }
+
+                if ( form.nickname.value.length < 4 ) {
+                    form.nickname.focus();
+                    toastWarning('별명을 4자 이상 입력해주세요.');
+                    return;
+                }
+
+                form.submit();
+                submitModifyFormDone = true;
+            }
+        </script>
+    </div>
+</div>
+
+</body>
+
+</html>

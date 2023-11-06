@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/usr/post")
+@RequestMapping("/templates/usr/post")
 @RequiredArgsConstructor
 @Validated
 public class PostController {
@@ -50,7 +50,7 @@ public class PostController {
         Page<Post> postPage = postService.findByKw(kwType, kw, true, pageable);
         model.addAttribute("postPage", postPage);
 
-        return "usr/post/list";
+        return "templates/usr/post/list";
     }
 
     @GetMapping("/myList")
@@ -66,7 +66,7 @@ public class PostController {
         Page<Post> postPage = postService.findByKw(rq.getMember(), kwType, kw, pageable);
         model.addAttribute("postPage", postPage);
 
-        return "usr/post/myList";
+        return "templates/usr/post/myList";
     }
 
     @GetMapping("/detail/{id}")
@@ -76,12 +76,12 @@ public class PostController {
     ) {
         Post post = postService.findById(id).get();
 
-        Map<String, GenFile> filesMap = postService.findGenFilesMapKeyByFileNo(post, "common", "attachment");
+        Map<String, GenFile> filesMap = postService.findGenFilesMapKeyByFileNo(post, "templates/common", "attachment");
 
         model.addAttribute("post", post);
         model.addAttribute("filesMap", filesMap);
 
-        return "usr/post/detail";
+        return "templates/usr/post/detail";
     }
 
     @GetMapping("/listByKeyword/{postKeywordId}")
@@ -100,7 +100,7 @@ public class PostController {
         Page<Post> postPage = postService.findByTag(postKeyword.getAuthor(), postKeyword.getContent(), true, pageable);
         model.addAttribute("postPage", postPage);
 
-        return "usr/post/listByKeyword";
+        return "templates/usr/post/listByKeyword";
     }
 
     @GetMapping("/listByTag/{tagContent}")
@@ -115,7 +115,7 @@ public class PostController {
         Page<Post> postPage = postService.findByTag(tagContent, true, pageable);
         model.addAttribute("postPage", postPage);
 
-        return "usr/post/listByTag";
+        return "templates/usr/post/listByTag";
     }
 
     @GetMapping("/myListByTag/{tagContent}")
@@ -130,13 +130,13 @@ public class PostController {
         Page<Post> postPage = postService.findByTag(rq.getMember(), tagContent, pageable);
         model.addAttribute("postPage", postPage);
 
-        return "usr/post/mylistByTag";
+        return "templates/usr/post/mylistByTag";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/write")
     public String showWrite() {
-        return "usr/post/write";
+        return "templates/usr/post/write";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -151,7 +151,7 @@ public class PostController {
         if (Ut.file.exists(writeForm.getAttachment__1()))
             postService.saveAttachmentFile(rsData.getData(), writeForm.getAttachment__2(), 2);
 
-        return rq.redirectOrBack("/usr/post/detail/%d".formatted(rsData.getData().getId()), rsData);
+        return rq.redirectOrBack("/templates/usr/post/detail/%d".formatted(rsData.getData().getId()), rsData);
     }
 
     @Getter
@@ -178,12 +178,12 @@ public class PostController {
     ) {
         Post post = postService.findById(id).get();
 
-        Map<String, GenFile> filesMap = postService.findGenFilesMapKeyByFileNo(post, "common", "attachment");
+        Map<String, GenFile> filesMap = postService.findGenFilesMapKeyByFileNo(post, "templates/common", "attachment");
 
         model.addAttribute("post", post);
         model.addAttribute("filesMap", filesMap);
 
-        return "usr/post/modify";
+        return "templates/usr/post/modify";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -207,7 +207,7 @@ public class PostController {
         if (Ut.file.exists(modifyForm.getAttachment__2()))
             postService.saveAttachmentFile(rsData.getData(), modifyForm.getAttachment__2(), 2);
 
-        return rq.redirectOrBack("/usr/post/detail/%d".formatted(rsData.getData().getId()), rsData);
+        return rq.redirectOrBack("/templates/usr/post/detail/%d".formatted(rsData.getData().getId()), rsData);
     }
 
     @Getter
@@ -237,7 +237,7 @@ public class PostController {
 
         RsData<?> rsData = postService.remove(post);
 
-        return rq.redirectOrBack("/usr/post/myList", rsData);
+        return rq.redirectOrBack("/templates/usr/post/myList", rsData);
     }
 
     public boolean assertActorCanModify() {

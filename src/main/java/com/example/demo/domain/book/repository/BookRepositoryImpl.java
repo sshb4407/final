@@ -17,6 +17,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import static com.example.demo.domain.book.entity.QBook.book;
 
+
 @RequiredArgsConstructor
 public class BookRepositoryImpl implements BookRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;

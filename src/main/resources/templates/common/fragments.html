@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+</head>
+
+<body>
+
+<th:block th:fragment="bookListItemCard(post)">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+
+            <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">번호</span>
+                    </label>
+                    <div th:text="${book.id}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">작성일</span>
+                    </label>
+                    <div th:text="${#temporals.format(book.createDate, 'yy.MM.dd')}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">저자</span>
+                    </label>
+                    <div th:text="${book.author.producerName}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">공개</span>
+                    </label>
+                    <div th:text="${book.publicHanName}"></div>
+                </div>
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">제목</span>
+                    </label>
+                    <a class="link truncate" th:href="|/usr/book/detail/${book.id}?listUrl=${@rq.encodedCurrentUrl}|"
+                       th:text="${book.subject}"></a>
+                </div>
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">태그</span>
+                    </label>
+                    <div th:utext="${book.getTagLinks('<a class=`link` href=`%s`>#%s</a>', @rq.getSuitableListByTagPageBaseUrlByCurrentUrl('book') + '/%s')}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="toastuiEidtorLib">
+    <!-- 토스트 에디터에 사용될 새너타이즈 도구 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+
+    <!-- 토스트 UI 에디터 - 코어 -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"/>
+
+    <!-- 토스트 UI 에디터 - 한국어 -->
+    <script src="https://uicdn.toast.com/editor/latest/i18n/ko-kr.js"></script>
+
+    <!-- 토스트 UI 차트 - 코어 -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.css">
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.js"></script>
+
+    <!-- 토스트 UI 에디터 - 토스트 UI 차트를 에디터에 연결 -->
+    <script src="https://uicdn.toast.com/editor-plugin-chart/latest/toastui-editor-plugin-chart.min.js"></script>
+
+    <!-- 코드 신택스 하이라이터, 프리즈마의 기본 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+
+    <!-- 토스트 UI 에디터 - 코드 신택스 하이라이터 -->
+    <link rel="stylesheet"
+          href="https://uicdn.toast.com/editor-plugin-code-syntax-highlight/latest/toastui-editor-plugin-code-syntax-highlight.min.css">
+    <!-- 프리즈마 JS가 아래 스크립트에 내장되어 있음 -->
+    <script src="https://uicdn.toast.com/editor-plugin-code-syntax-highlight/latest/toastui-editor-plugin-code-syntax-highlight-all.min.js"></script>
+
+    <!-- 토스트 UI 에디터 - UML 플러그인 -->
+    <script src="https://uicdn.toast.com/editor-plugin-uml/latest/toastui-editor-plugin-uml.min.js"></script>
+
+    <!-- 토스트 UI 컬러피커 -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.css"/>
+    <script src="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.min.js"></script>
+
+    <!-- 토스트 UI 컬러피커를 토스트 UI 에디터에 연결 -->
+    <link rel="stylesheet"
+          href="https://uicdn.toast.com/editor-plugin-color-syntax/latest/toastui-editor-plugin-color-syntax.min.css"/>
+    <script
+            src="https://uicdn.toast.com/editor-plugin-color-syntax/latest/toastui-editor-plugin-color-syntax.min.js"></script>
+
+    <!-- 토스트 UI 에디터 플러그인, 테이블 셀 병합 -->
+    <script
+            src="https://uicdn.toast.com/editor-plugin-table-merged-cell/latest/toastui-editor-plugin-table-merged-cell.min.js"></script>
+
+    <style>
+        /* 토스트 UI, 유튜브 플러그인에서 사용하는 CSS 시작 */
+        .ratio-16\/9::after {
+            content: "";
+            display: block;
+            padding-top: calc(100% / 16 * 9);
+        }
+
+        .ratio-9\/16::after {
+            content: "";
+            display: block;
+            padding-top: calc(100% / 9 * 16);
+        }
+    </style>
+
+    <script>
+        function getUriParams(uri) {
+            uri = uri.trim();
+            uri = uri.replaceAll("&amp;", "&");
+            if (uri.indexOf("#") !== -1) {
+                let pos = uri.indexOf("#");
+                uri = uri.substr(0, pos);
+            }
+
+            let params = {};
+
+            uri.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (str, key, value) {
+                params[key] = value;
+            });
+            return params;
+        }
+
+        function codepenPlugin() {
+            const toHTMLRenderers = {
+                codepen(node) {
+                    const html = renderCodepen(node.literal);
+
+                    return [
+                        {type: "openTag", tagName: "div", outerNewLine: true},
+                        {type: "html", content: html},
+                        {type: "closeTag", tagName: "div", outerNewLine: true},
+                    ];
+                },
+            };
+
+            function renderCodepen(uri) {
+                let uriParams = getUriParams(uri);
+
+                let height = 400;
+
+                let preview = "";
+
+                if (uriParams.height) {
+                    height = uriParams.height;
+                }
+
+                let width = "100%";
+
+                if (uriParams.width) {
+                    width = uriParams.width;
+                }
+
+                if (!isNaN(width)) {
+                    width += "px";
+                }
+
+                let iframeUri = uri;
+
+                if (iframeUri.indexOf("#") !== -1) {
+                    let pos = iframeUri.indexOf("#");
+                    iframeUri = iframeUri.substr(0, pos);
+                }
+
+                return (
+                    '<iframe height="' +
+                    height +
+                    '" style="width: ' +
+                    width +
+                    ';" title="" src="' +
+                    iframeUri +
+                    '" allowtransparency="true" allowfullscreen="true"></iframe>'
+                );
+            }
+
+            return {toHTMLRenderers};
+        }
+
+        function replPlugin() {
+            const toHTMLRenderers = {
+                repl(node) {
+                    const html = renderRepl(node.literal);
+
+                    return [
+                        {type: "openTag", tagName: "div", outerNewLine: true},
+                        {type: "html", content: html},
+                        {type: "closeTag", tagName: "div", outerNewLine: true},
+                    ];
+                },
+            };
+
+            function renderRepl(uri) {
+                var uriParams = getUriParams(uri);
+
+                var height = 400;
+
+                if (uriParams.height) {
+                    height = uriParams.height;
+                }
+
+                return (
+                    '<iframe frameborder="0" width="100%" height="' +
+                    height +
+                    'px" src="' +
+                    uri +
+                    '"></iframe>'
+                );
+            }
+
+            return {toHTMLRenderers};
+        }
+
+        function youtubePlugin() {
+            const toHTMLRenderers = {
+                youtube(node) {
+                    const html = renderYoutube(node.literal);
+
+                    return [
+                        {type: "openTag", tagName: "div", outerNewLine: true},
+                        {type: "html", content: html},
+                        {type: "closeTag", tagName: "div", outerNewLine: true},
+                    ];
+                },
+            };
+
+            function renderYoutube(uri) {
+                uri = uri.replace("https://www.youtube.com/watch?v=", "");
+                uri = uri.replace("http://www.youtube.com/watch?v=", "");
+                uri = uri.replace("www.youtube.com/watch?v=", "");
+                uri = uri.replace("youtube.com/watch?v=", "");
+                uri = uri.replace("https://youtu.be/", "");
+                uri = uri.replace("http://youtu.be/", "");
+                uri = uri.replace("youtu.be/", "");
+
+                let uriParams = getUriParams(uri);
+
+                let width = "100%";
+                let height = "100%";
+
+                let maxWidth = 500;
+
+                if (!uriParams["max-width"] && uriParams["ratio"] == "9/16") {
+                    uriParams["max-width"] = 300;
+                }
+
+                if (uriParams["max-width"]) {
+                    maxWidth = uriParams["max-width"];
+                }
+
+                let ratio = "16/9";
+
+                if (uriParams["ratio"]) {
+                    ratio = uriParams["ratio"];
+                }
+
+                let marginLeft = "auto";
+
+                if (uriParams["margin-left"]) {
+                    marginLeft = uriParams["margin-left"];
+                }
+
+                let marginRight = "auto";
+
+                if (uriParams["margin-right"]) {
+                    marginRight = uriParams["margin-right"];
+                }
+
+                let youtubeId = uri;
+
+                if (youtubeId.indexOf("?") !== -1) {
+                    let pos = uri.indexOf("?");
+                    youtubeId = youtubeId.substr(0, pos);
+                }
+
+                return (
+                    '<div style="max-width:' +
+                    maxWidth +
+                    "px; margin-left:" +
+                    marginLeft +
+                    "; margin-right:" +
+                    marginRight +
+                    ';" class="ratio-' +
+                    ratio +
+                    ' relative"><iframe class="absolute top-0 left-0 w-full" width="' +
+                    width +
+                    '" height="' +
+                    height +
+                    '" src="https://www.youtube.com/embed/' +
+                    youtubeId +
+                    '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>'
+                );
+            }
+
+            return {toHTMLRenderers};
+        }
+
+        function katexPlugin() {
+            const toHTMLRenderers = {
+                katex(node) {
+                    let html = katex.renderToString(node.literal, {
+                        throwOnError: false,
+                    });
+
+                    return [
+                        {type: "openTag", tagName: "div", outerNewLine: true},
+                        {type: "html", content: html},
+                        {type: "closeTag", tagName: "div", outerNewLine: true},
+                    ];
+                },
+            };
+
+            return {toHTMLRenderers};
+        }
+
+        const ToastEditor__chartOptions = {
+            minWidth: 100,
+            maxWidth: 600,
+            minHeight: 100,
+            maxHeight: 300,
+        };
+
+        function configPlugin() {
+            const toHTMLRenderers = {
+                config(node) {
+                    return [
+                        {type: "openTag", tagName: "div", outerNewLine: true},
+                        {type: "html", content: ""},
+                        {type: "closeTag", tagName: "div", outerNewLine: true},
+                    ];
+                },
+            };
+
+            return {toHTMLRenderers};
+        }
+
+        function hidePlugin() {
+            const toHTMLRenderers = {
+                hide(node) {
+                    return [
+                        {type: "openTag", tagName: "div", outerNewLine: true},
+                        {type: "html", content: ""},
+                        {type: "closeTag", tagName: "div", outerNewLine: true},
+                    ];
+                },
+            };
+
+            return {toHTMLRenderers};
+        }
+
+        function ToastEditor__escape(origin) {
+            return origin
+                .replaceAll("<t-script", "<script")
+                .replaceAll("</t-script", "</script");
+        }
+
+        function ToastEditor__init() {
+            $(".toast-ui-editor").each(function (index, node) {
+                const $node = $(node);
+                const $initialValueEl = $node.find(" > script");
+                const initialValue =
+                    $initialValueEl.length == 0
+                        ? ""
+                        : ToastEditor__escape($initialValueEl.html().trim());
+
+                const editor = new toastui.Editor({
+                    el: node,
+                    previewStyle: "vertical",
+                    initialValue: initialValue,
+                    height: $node.attr('height') ?? "100%",
+                    language: "ko-KR",
+                    useCommandShortcut: true,
+                    hooks: {
+                        addImageBlobHook: function (blob, callback) {
+                            const csrfToken = $("meta[name='_csrf']").attr("content");
+                            const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+                            const formData = new FormData();
+                            formData.append('file', blob);
+
+                            fetch('/usr/genFile/temp', {
+                                method: 'POST',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    [csrfHeader]: csrfToken
+                                },
+                                body: formData
+                            }).then(function (response) {
+                                return response.json();
+                            }).then(function (myJson) {
+                                callback(myJson.data + "?type=temp");
+                            });
+                        }
+                    },
+                    placeholder: $node.attr('placeholder') ?? "Please enter text.",
+                    autofocus: $node.attr('autofocus') == 'autofocus',
+                    plugins: [
+                        [toastui.Editor.plugin.chart, ToastEditor__chartOptions],
+                        [toastui.Editor.plugin.codeSyntaxHighlight, {highlighter: Prism}],
+                        toastui.Editor.plugin.colorSyntax,
+                        toastui.Editor.plugin.tableMergedCell,
+                        [toastui.Editor.plugin.uml, {rendererURL: 'http://www.plantuml.com/plantuml/svg/'}],
+                        katexPlugin,
+                        youtubePlugin,
+                        codepenPlugin,
+                        replPlugin,
+                        configPlugin,
+                        hidePlugin,
+                    ],
+                    customHTMLSanitizer: (html) => {
+                        return (
+                            DOMPurify.sanitize(html, {
+                                ADD_TAGS: ["iframe"],
+                                ADD_ATTR: [
+                                    "width",
+                                    "height",
+                                    "allow",
+                                    "allowfullscreen",
+                                    "frameborder",
+                                    "scrolling",
+                                    "style",
+                                    "title",
+                                    "loading",
+                                    "allowtransparency",
+                                ],
+                            }) || ""
+                        );
+                    },
+                });
+
+                $node.data("data-toast-editor", editor);
+            });
+        }
+
+        function ToastEditorView__init() {
+            $(".toast-ui-viewer").each(function (index, node) {
+                const $node = $(node);
+                const $initialValueEl = $node.find(" > script");
+                const initialValue =
+                    $initialValueEl.length == 0
+                        ? ""
+                        : ToastEditor__escape($initialValueEl.html().trim());
+                $node.empty();
+
+                const viewer = new toastui.Editor.factory({
+                    el: node,
+                    initialValue: initialValue,
+                    viewer: true,
+                    theme: toastUiThemeName,
+                    plugins: [
+                        [toastui.Editor.plugin.chart, ToastEditor__chartOptions],
+                        [toastui.Editor.plugin.codeSyntaxHighlight, {highlighter: Prism}],
+                        toastui.Editor.plugin.colorSyntax,
+                        toastui.Editor.plugin.tableMergedCell,
+                        [toastui.Editor.plugin.uml, {rendererURL: 'http://www.plantuml.com/plantuml/svg/'}],
+                        katexPlugin,
+                        youtubePlugin,
+                        codepenPlugin,
+                        replPlugin,
+                        configPlugin,
+                        hidePlugin,
+                    ],
+                    customHTMLSanitizer: (html) => {
+                        return (
+                            DOMPurify.sanitize(html, {
+                                ADD_TAGS: ["iframe"],
+                                ADD_ATTR: [
+                                    "width",
+                                    "height",
+                                    "allow",
+                                    "allowfullscreen",
+                                    "frameborder",
+                                    "scrolling",
+                                    "style",
+                                    "title",
+                                    "loading",
+                                    "allowtransparency",
+                                ],
+                            }) || ""
+                        );
+                    },
+                });
+
+                $node.data("data-toast-editor", viewer);
+            });
+        }
+
+        $(function () {
+            ToastEditor__init();
+            ToastEditorView__init();
+        })
+
+    </script>
+</th:block>
+
+<th:block th:fragment="pagination(itemPage, queryStrBase, pageArmSize)">
+    <div th:if="${!itemPage.isEmpty()}"
+         class="flex justify-center">
+        <div class="join">
+            <a th:href="@{|${queryStrBase}page=1|}"
+               class="join-item btn"
+               th:classappend="${itemPage.number + 1 == 1} ? 'btn-active'"
+               th:text="1"
+            >
+            </a>
+
+            <a
+                    th:href="@{|${queryStrBase}page=${itemPage.number + 1 - pageArmSize - 1}|}"
+                    th:if="${itemPage.number + 1 - pageArmSize > 2}"
+                    class="join-item btn"
+            >...</a>
+
+            <th:block th:if="${2 <= itemPage.totalPages - 1}">
+                <a th:each="page: ${#numbers.sequence(2, itemPage.totalPages - 1)}"
+                   th:if="${page >= itemPage.number + 1 - pageArmSize and page <= itemPage.number + 1 + pageArmSize}"
+                   th:classappend="${page == itemPage.number + 1} ? 'btn-active'"
+                   th:href="@{|${queryStrBase}page=${page}|}"
+                   class="join-item btn" th:text="${page}">
+                </a>
+            </th:block>
+
+            <a
+                    th:href="@{|${queryStrBase}page=${itemPage.number + 1 + pageArmSize + 1}|}"
+                    th:if="${itemPage.number + 1 + pageArmSize < itemPage.totalPages - 1}"
+                    class="join-item btn"
+            >...</a>
+
+            <a th:href="@{|${queryStrBase}page=${itemPage.totalPages}|}"
+               class="join-item btn"
+               th:classappend="${itemPage.number + 1 == itemPage.totalPages} ? 'btn-active'"
+               th:text="${itemPage.totalPages}"
+            ></a>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="postListItemCard(post)">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+
+            <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">번호</span>
+                    </label>
+                    <div th:text="${post.id}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">작성일</span>
+                    </label>
+                    <div th:text="${#temporals.format(post.createDate, 'yy.MM.dd')}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">작성자</span>
+                    </label>
+                    <div th:text="${post.author.nickname}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">공개</span>
+                    </label>
+                    <div th:text="${post.publicHanName}"></div>
+                </div>
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">제목</span>
+                    </label>
+                    <a class="link truncate" th:href="|/usr/post/detail/${post.id}?listUrl=${@rq.encodedCurrentUrl}|"
+                       th:text="${post.subject}"></a>
+                </div>
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">태그</span>
+                    </label>
+                    <div th:utext="${post.getTagLinks('<a class=`link` href=`%s`>#%s</a>', @rq.getSuitableListByTagPageBaseUrlByCurrentUrl('post') + '/%s')}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="articleListItemCard(article)">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+
+            <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">게시물번호</span>
+                    </label>
+                    <div th:text="${article.id}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">작성일</span>
+                    </label>
+                    <div th:text="${#temporals.format(article.createDate, 'yy.MM.dd')}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">작성자</span>
+                    </label>
+                    <div th:text="${article.author.nickname}"></div>
+                </div>
+
+<!--                <div class="form-control">-->
+<!--                    <label class="label">-->
+<!--                        <span class="label-text">본문</span>-->
+<!--                    </label>-->
+<!--                    <a class="link" target="_blank" th:href="|/usr/post/listByKeyword/${book.postKeyword.id}|"-->
+<!--                       th:text="|#${book.postKeyword.content}(${book.postKeyword.total})|"></a>-->
+<!--                </div>-->
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">제목</span>
+                    </label>
+                    <a class="link truncate" th:href="|/usr/article/${article.board.code}/detail/${article.id}|"
+                       th:text="${article.subject}"></a>
+                </div>
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">태그</span>
+                    </label>
+                    <div th:utext="${article.getTagLinks('<a class=`link` href=`%s`>#%s</a>', '/usr/article/listByTag/%s')}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="lectureListItemCard(lecture)">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+
+            <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">게시물번호</span>
+                    </label>
+                    <div th:text="${lecture.id}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">작성일</span>
+                    </label>
+                    <div th:text="${#temporals.format(lecture.createDate, 'yy.MM.dd')}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">작성자</span>
+                    </label>
+                    <div th:text="${lecture.producer.producerName}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">공개</span>
+                    </label>
+                    <div th:text="${lecture.publicHanName}"></div>
+                </div>
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">제목</span>
+                    </label>
+                    <a class="link truncate" th:href="|/usr/lecture/detail/${lecture.id}|"
+                       th:text="${lecture.subject}"></a>
+                </div>
+
+                <div class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">태그</span>
+                    </label>
+                    <div th:utext="${lecture.getTagLinks('<a class=`link` href=`%s`>#%s</a>', '/usr/lecture/listByTag/%s')}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+
+
+
+</body>
+</html>

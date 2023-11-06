@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-@RequestMapping("/usr/member")
+@RequestMapping("/templates/usr/member")
 @RequiredArgsConstructor
 @Validated
 public class MemberController {
@@ -31,13 +31,13 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @GetMapping("/login")
     public String showLogin() {
-        return "usr/member/login";
+        return "templates/usr/member/login";
     }
 
     @PreAuthorize("isAnonymous()")
     @GetMapping("/join")
     public String showJoin() {
-        return "usr/member/join";
+        return "templates/usr/member/join";
     }
 
     @PreAuthorize("isAnonymous()")
@@ -103,13 +103,13 @@ public class MemberController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/notVerified")
     public String showNotVerified() {
-        return "usr/member/notVerified";
+        return "templates/usr/member/notVerified";
     }
 
     @PreAuthorize("isAnonymous()")
     @GetMapping("/findUsername")
     public String showFindUsername() {
-        return "usr/member/findUsername";
+        return "templates/usr/member/findUsername";
     }
 
     @PreAuthorize("isAnonymous()")
@@ -120,7 +120,7 @@ public class MemberController {
         return memberService.findByEmail(email)
                 .map(member ->
                         rq.redirect(
-                                "/usr/member/login?lastUsername=%s".formatted(member.getUsername()),
+                                "/templates/usr/member/login?lastUsername=%s".formatted(member.getUsername()),
                                 "해당 회원의 아이디는 `%s` 입니다.".formatted(member.getUsername())
                         )
                 )
@@ -130,7 +130,7 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @GetMapping("/findPassword")
     public String showFindPassword() {
-        return "usr/member/findPassword";
+        return "templates/usr/member/findPassword";
     }
 
     @PreAuthorize("isAnonymous()")
@@ -143,7 +143,7 @@ public class MemberController {
                 .map(member -> {
                     memberService.sendTempPasswordToEmail(member);
                     return rq.redirect(
-                            "/usr/member/login?lastUsername=%s".formatted(member.getUsername()),
+                            "/templates/usr/member/login?lastUsername=%s".formatted(member.getUsername()),
                             "해당 회원의 이메일로 임시 비밀번호를 발송하였습니다."
                     );
                 }).orElseGet(() -> rq.historyBack("일치하는 회원이 존재하지 않습니다."));
@@ -152,13 +152,13 @@ public class MemberController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public String showMe() {
-        return "usr/member/me";
+        return "templates/usr/member/me";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify")
     public String showModify() {
-        return "usr/member/modify";
+        return "templates/usr/member/modify";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -172,13 +172,13 @@ public class MemberController {
                 modifyForm.getProfileImg()
         );
 
-        return rq.redirectOrBack("/usr/member/me", modifyRs);
+        return rq.redirectOrBack("/templates/usr/member/me", modifyRs);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/checkPassword")
     public String showCheckPassword() {
-        return "usr/member/checkPassword";
+        return "templates/usr/member/checkPassword";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -230,7 +230,7 @@ public class MemberController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/beProducer")
     public String showBeProducer() {
-        return "usr/member/beProducer";
+        return "templates/usr/member/beProducer";
     }
 
     @SneakyThrows
@@ -241,7 +241,7 @@ public class MemberController {
 
         RsData<Member> rs = memberService.beProducer(member.getId(), producerName);
 
-        return rq.redirectOrBack("/usr/member/me", rs);
+        return rq.redirectOrBack("/templates/usr/member/me", rs);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.demo.domain.postTag.entity;
 
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.domain.document.standard.DocumentSortableKeyword;
 import com.example.demo.domain.document.standard.DocumentSortableTag;
 import com.example.demo.domain.member.entity.Member;

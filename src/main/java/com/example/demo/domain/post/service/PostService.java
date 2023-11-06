@@ -138,7 +138,7 @@ public class PostService {
 
     @Transactional
     public RsData<GenFile> saveAttachmentFile(Post post, String attachmentFile, long fileNo) {
-        GenFile genFile = genFileService.save(post.getModelName(), post.getId(), "common", "attachment", fileNo, attachmentFile);
+        GenFile genFile = genFileService.save(post.getModelName(), post.getId(), "templates/common", "attachment", fileNo, attachmentFile);
 
         return new RsData<>("S-1", genFile.getId() + "번 파일이 생성되었습니다.", genFile);
     }
@@ -149,7 +149,7 @@ public class PostService {
 
     @Transactional
     public void removeAttachmentFile(Post post, long fileNo) {
-        genFileService.remove(post.getModelName(), post.getId(), "common", "attachment", fileNo);
+        genFileService.remove(post.getModelName(), post.getId(), "templates/common", "attachment", fileNo);
     }
 
     public Page<Post> findByTag(String tagContent, boolean isPublic, Pageable pageable) {

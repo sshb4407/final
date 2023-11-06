@@ -1,0 +1,167 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|강의 수정|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <th:block th:replace="common/fragments :: toastuiEidtorLib"></th:block>
+
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span th:text="|강의 수정|"></span>
+        </h1>
+
+        <form class="flex flex-col gap-6" method="POST" enctype="multipart/form-data"
+              onsubmit="submitModifyForm(this); return false;"
+              th:action>
+            <input type="hidden" name="body">
+            <input type="hidden" name="bodyHtml">
+
+            <div class="flex bg-base-100 sticky top-[64px] shadow-sm z-10 -mx-4 px-4 py-2 flex-wrap justify-between gap-2 items-center">
+                <div class="form-control">
+                    <label class="cursor-pointer label">
+                        <span class="label-text">공개여부</span>
+                    </label>
+
+                    <input type="checkbox" name="public" value="true" th:checked="${lecture.public}"
+                           class="toggle toggle-primary"/>
+                </div>
+
+                <a class="btn btn-sm btn-outline" th:href="|/usr/lecture/write|">
+                    <i class="fa-solid fa-pen"></i>
+                    커리큘럼 수정하기
+                </a>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">제목</span>
+                </label>
+                <input class="input input-bordered" maxlength="100"
+                       name="subject" placeholder="제목" type="text" th:value="${lecture.subject}">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">태그</span>
+                </label>
+                <input class="input input-bordered" maxlength="100"
+                       name="tagsStr" placeholder="구분자는 `#` 과 `,` 입니다." type="text" th:value="${lecture.tagsStr}">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">내용</span>
+                </label>
+
+                <div class="toast-ui-editor" height="calc(100vh - 200px)" placeholder="내용">
+                    <script type="text/x-template" th:utext="${lecture.bodyForEditor}"></script>
+                </div>
+            </div>
+
+            <th:block th:each="i : ${#numbers.sequence(1, 2)}" th:with="genFile = ${filesMap[i + '']}">
+
+                <div th:if="${genFile != null}" class="form-control col-span-full">
+                    <label class="label">
+                        <span class="label-text">기존 강의자료 <span th:text="${i}"></span> 삭제</span>
+                    </label>
+
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" class="checkbox" th:name="'attachmentRemove__' + ${i}" th:value="true">
+
+                        <a th:href="|${genFile.downloadUrl}|" class="link mt-2">
+                            <i class="fa-regular fa-file"></i>
+                            강의자료
+                            <span th:text="${i}"></span>
+                            (<span th:text="${genFile.originFileName}"></span>)
+                            다운로드
+                        </a>
+                    </div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">새 강의자료 <span th:text="${i}"></span></span>
+                    </label>
+                    <input class="file-input file-input-bordered"
+                           th:name="'attachment__' + ${i}"
+                           type="file">
+                </div>
+            </th:block>
+
+            <div class="flex flex-col gap-2">
+                <button class="btn btn-block btn-primary gap-1">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>글수정</span>
+                </button>
+
+                <div class="text-center">
+                    <a class="btn btn-link" th:href="|/usr/lecture/list|">목록</a>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            let submitModifyFormDone = false;
+
+            function submitModifyForm(form) {
+                if (submitModifyFormDone) return;
+
+                form.subject.value = form.subject.value.trim();
+
+                if (form.subject.value.length == 0) {
+                    form.subject.focus();
+                    toastWarning('제목을 입력해주세요.');
+                    return;
+                }
+
+                if (form.subject.value.length < 2) {
+                    form.subject.focus();
+                    toastWarning('제목을 2자 이상 입력해주세요.');
+                    return;
+                }
+
+                const editor = $(form).find(".toast-ui-editor").data("data-toast-editor");
+
+                const markdown = editor.getMarkdown().trim();
+                const html = editor.getHTML().trim();
+
+                form.body.value = markdown;
+                form.bodyHtml.value = html;
+
+                if (form.body.value.length == 0 || form.bodyHtml.value.length == 0) {
+                    toastWarning("내용을 입력해주세요");
+                    editor.focus();
+                    return;
+                }
+
+                // 파일 입력 필드의 인덱스 시작
+                for (let i = 1; true; i++) {
+                    const fileInput = form['attachment__' + i];
+
+                    // 해당 이름의 입력 필드가 없으면 반복문 종료
+                    if (!fileInput) break;
+
+                    if (fileInput.files.length > 0 && fileInput.files[0].size === 0) {
+                        fileInput.focus();
+                        toastWarning('첨부파일 ' + i + '의 용량이 0 입니다. 다른 파일을 선택해주세요.');
+                        return;
+                    }
+
+                    i++;
+                }
+
+                form.submit();
+                submitModifyFormDone = true;
+            }
+        </script>
+    </div>
+</div>
+
+</body>
+
+</html>

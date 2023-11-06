@@ -193,7 +193,7 @@ public class Rq {
         // 200 이 아니라 400 으로 응답코드가 지정되도록
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-        return "common/js"; //  history back
+        return "templates/common/js"; //  history back
     }
 
     public String redirect(String url) {
@@ -271,17 +271,17 @@ public class Rq {
     public String getSuitableListByTagPageBaseUrlByCurrentUrl(String domainName) {
         String currentUrl = getCurrentUrlPath();
 
-        String listByTagPageBaseUrl = "/usr/" + domainName + "/listByTag";
+        String listByTagPageBaseUrl = "/templates/usr/" + domainName + "/listByTag";
 
-        if (currentUrl.startsWith("/usr/" + domainName + "/list")) return listByTagPageBaseUrl;
-        if (currentUrl.startsWith("/usr/" + domainName + "/listByTag")) return listByTagPageBaseUrl;
+        if (currentUrl.startsWith("/templates/usr/" + domainName + "/list")) return listByTagPageBaseUrl;
+        if (currentUrl.startsWith("/templates/usr/" + domainName + "/listByTag")) return listByTagPageBaseUrl;
 
         String listUrl = getParam("listUrl", "");
 
-        if (currentUrl.startsWith("/usr/" + domainName + "/detail") && listUrl.isBlank()) return listByTagPageBaseUrl;
-        if (listUrl.startsWith("/usr/" + domainName + "/list")) return listByTagPageBaseUrl;
-        if (listUrl.startsWith("/usr/" + domainName + "/listByTag")) return listByTagPageBaseUrl;
+        if (currentUrl.startsWith("/templates/usr/" + domainName + "/detail") && listUrl.isBlank()) return listByTagPageBaseUrl;
+        if (listUrl.startsWith("/templates/usr/" + domainName + "/list")) return listByTagPageBaseUrl;
+        if (listUrl.startsWith("/templates/usr/" + domainName + "/listByTag")) return listByTagPageBaseUrl;
 
-        return "/usr/post/myListByTag";
+        return "/templates/usr/post/myListByTag";
     }
 }

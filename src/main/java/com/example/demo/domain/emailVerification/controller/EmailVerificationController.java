@@ -27,7 +27,7 @@ public class EmailVerificationController {
 
         // 각 상황별 이동해야 하는 URL
         String afterFailUrl = "/";
-        String afterSuccessButLogoutUrl = "/usr/member/login";
+        String afterSuccessButLogoutUrl = "/templates/usr/member/login";
         String afterSuccessUrl = "/";
 
         // 인증실패한 상황

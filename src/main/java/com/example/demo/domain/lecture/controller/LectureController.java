@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/usr/lecture")
+@RequestMapping("/templates/usr/lecture")
 @RequiredArgsConstructor
 @Validated
 public class LectureController {
@@ -51,7 +51,7 @@ public class LectureController {
         Page<Lecture> lecturePage = lectureService.findByKw(kwType, kw, pageable);
         model.addAttribute("lecturePage", lecturePage);
 
-        return "usr/lecture/list";
+        return "templates/usr/lecture/list";
     }
 
     @GetMapping("/detail/{id}")
@@ -62,19 +62,19 @@ public class LectureController {
         Lecture lecture = lectureService.findById(id).get();
         List<Lesson> lessons = lecture.getLessons();
 
-        Map<String, GenFile> filesMap = lectureService.findGenFilesMapKeyByFileNo(lecture, "common", "attachment");
+        Map<String, GenFile> filesMap = lectureService.findGenFilesMapKeyByFileNo(lecture, "templates/common", "attachment");
 
         model.addAttribute("lecture", lecture);
         model.addAttribute("lessons", lessons);
         model.addAttribute("filesMap", filesMap);
 
-        return "usr/lecture/detail";
+        return "templates/usr/lecture/detail";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/write")
     public String showWrite() {
-        return "usr/lecture/write";
+        return "templates/usr/lecture/write";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -89,7 +89,7 @@ public class LectureController {
         if (Ut.file.exists(writeForm.getAttachment__2()))
             lectureService.saveAttachmentFile(rsData.getData(), writeForm.getAttachment__2(), 2);
 
-        return rq.redirectOrBack("/usr/lecture/detail/%d".formatted(rsData.getData().getId()), rsData);
+        return rq.redirectOrBack("/templates/usr/lecture/detail/%d".formatted(rsData.getData().getId()), rsData);
     }
 
     @Setter
@@ -116,13 +116,13 @@ public class LectureController {
     ) {
         Lecture lecture = lectureService.findById(id).get();
 
-        Map<String, GenFile> filesMap = lectureService.findGenFilesMapKeyByFileNo(lecture, "common", "attachment");
+        Map<String, GenFile> filesMap = lectureService.findGenFilesMapKeyByFileNo(lecture, "templates/common", "attachment");
 
         model.addAttribute("lecture", lecture);
         model.addAttribute("filesMap", filesMap);
 
 
-        return "usr/lecture/modify";
+        return "templates/usr/lecture/modify";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -146,7 +146,7 @@ public class LectureController {
         if (Ut.file.exists(modifyForm.getAttachment__2()))
             lectureService.saveAttachmentFile(rsData.getData(), modifyForm.getAttachment__2(), 2);
 
-        return rq.redirectOrBack("/usr/lecture/detail/%d".formatted(rsData.getData().getId()), rsData);
+        return rq.redirectOrBack("/templates/usr/lecture/detail/%d".formatted(rsData.getData().getId()), rsData);
     }
 
     @Getter
@@ -175,7 +175,7 @@ public class LectureController {
         Lecture lecture = lectureService.findById(id).get();
         RsData<?> rsData = lectureService.remove(lecture);
 
-        return rq.redirectOrBack("/usr/lecture/list", rsData);
+        return rq.redirectOrBack("/templates/usr/lecture/list", rsData);
     }
 
     @GetMapping("/listByTag/{tagContent}")
@@ -190,7 +190,7 @@ public class LectureController {
         Page<Lecture> lecturePage = lectureService.findByTag(tagContent, pageable);
         model.addAttribute("lecturePage", lecturePage);
 
-        return "usr/lecture/listByTag";
+        return "templates/usr/lecture/listByTag";
     }
 
 

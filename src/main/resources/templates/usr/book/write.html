@@ -1,0 +1,150 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|글쓰기|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <th:block th:replace="common/fragments :: toastuiEidtorLib"></th:block>
+
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|책쓰기|"></span>
+        </h1>
+
+        <form class="flex flex-col gap-6" enctype="multipart/form-data" method="POST"
+              onsubmit="submitWriteForm(this); return false;"
+              th:action>
+            <input type="hidden" name="body">
+            <input type="hidden" name="bodyHtml">
+
+            <div class="form-control">
+                <label class="cursor-pointer label">
+                    <span class="label-text">책 본문</span>
+                </label>
+
+                <select name="postKeywordId" class="select select-bordered">
+                    <option selected disabled>-- 책 본문 --</option>
+                    <option th:each="postKeyword : ${postKeywords}" th:value="${postKeyword.id}"
+                            th:text="|${postKeyword.content}(${postKeyword.total})|"></option>                </select>
+            </div>
+
+            <div class="form-control">
+                <label class="cursor-pointer label">
+                    <span class="label-text">공개여부</span>
+                </label>
+
+                <input type="checkbox" name="public" value="true" class="toggle toggle-primary">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">제목</span>
+                </label>
+                <input class="input input-bordered" maxlength="100"
+                       name="subject" placeholder="제목" type="text" autofocus>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">태그</span>
+                </label>
+                <input class="input input-bordered" maxlength="100"
+                       name="tagsStr"
+                       placeholder="#IT #HTML #..."
+                       type="text">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">내용</span>
+                </label>
+
+                <div class="toast-ui-editor" height="calc(100vh - 200px)" placeholder="내용"></div>
+            </div>
+
+            <div th:each="i : ${#numbers.sequence(1, 2)}" class="form-control">
+                <label class="label">
+                    <span class="label-text">첨부파일 <span th:text="${i}"></span></span>
+                </label>
+                <input class="file-input file-input-bordered"
+                       th:name="'attachment__' + ${i}"
+                       type="file">
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <button class="btn btn-block btn-primary gap-1">
+                    <i class="fa-solid fa-pen"></i>
+                    <span>책쓰기</span>
+                </button>
+
+                <div class="text-center">
+                    <a th:with="listUrl = ${param.listUrl != null ? param.listUrl : '/usr/book/list'}"
+                       class="btn btn-link" th:href="${listUrl}">목록</a>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            let submitWriteFormDone = false;
+
+            function submitWriteForm(form) {
+                if (submitWriteFormDone) return;
+
+                form.subject.value = form.subject.value.trim();
+
+                if (form.subject.value.length == 0) {
+                    form.subject.focus();
+                    toastWarning('제목을 입력해주세요.');
+                    return;
+                }
+
+                if (form.subject.value.length < 2) {
+                    form.subject.focus();
+                    toastWarning('제목을 2자 이상 입력해주세요.');
+                    return;
+                }
+
+                const editor = $(form).find(".toast-ui-editor").data("data-toast-editor");
+
+                const markdown = editor.getMarkdown().trim();
+                const html = editor.getHTML().trim();
+
+                form.body.value = markdown;
+                form.bodyHtml.value = html;
+
+                if (form.body.value.length == 0 || form.bodyHtml.value.length == 0) {
+                    toastWarning("내용을 입력해주세요");
+                    editor.focus();
+                    return;
+                }
+
+                // 파일 입력 필드의 인덱스 시작
+                for (let i = 1; true; i++) {
+                    const fileInput = form['attachment__' + i];
+
+                    // 해당 이름의 입력 필드가 없으면 반복문 종료
+                    if (!fileInput) break;
+
+                    if (fileInput.files.length > 0 && fileInput.files[0].size === 0) {
+                        fileInput.focus();
+                        toastWarning('첨부파일 ' + i + '의 용량이 0 입니다. 다른 파일을 선택해주세요.');
+                        return;
+                    }
+
+                    i++;
+                }
+
+                form.submit();
+                submitWriteFormDone = true;
+            }
+        </script>
+    </div>
+</div>
+
+</body>
+
+</html>

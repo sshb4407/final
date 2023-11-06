@@ -1,6 +1,7 @@
 package com.example.demo.domain.lesson.entity;
 
-import com.example.demo.base.jpa.baseEntity.BaseEntity;
+
+import com.example.demo.base.jpa.BaseEntity;
 import com.example.demo.domain.genFile.entity.GenFile;
 import com.example.demo.domain.lecture.entity.Lecture;
 import jakarta.annotation.Nullable;

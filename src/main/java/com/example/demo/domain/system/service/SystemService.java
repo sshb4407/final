@@ -1,4 +1,4 @@
-package com.example.demo.domain.service;
+package com.example.demo.domain.system.service;
 
 import com.example.demo.domain.attr.service.AttrService;
 import lombok.RequiredArgsConstructor;

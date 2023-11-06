@@ -2,7 +2,7 @@ package com.example.demo.domain.article.service;
 
 import com.example.demo.base.app.AppConfig;
 import com.example.demo.base.rsData.RsData;
-import com.example.demo.domain.entity.Article;
+import com.example.demo.domain.article.entity.Article;
 import com.example.demo.domain.article.repository.ArticleRepository;
 import com.example.demo.domain.board.entity.Board;
 import com.example.demo.domain.document.service.DocumentService;
@@ -120,7 +120,7 @@ public class ArticleService {
 
     @Transactional
     public RsData<GenFile> saveAttachmentFile(Article article, String attachmentFile, long fileNo) {
-        GenFile genFile = genFileService.save(article.getModelName(), article.getId(), "common", "attachment", fileNo, attachmentFile);
+        GenFile genFile = genFileService.save(article.getModelName(), article.getId(), "templates/common", "attachment", fileNo, attachmentFile);
 
         return new RsData<>("S-1", genFile.getId() + "번 파일이 생성되었습니다.", genFile);
     }
@@ -131,7 +131,7 @@ public class ArticleService {
 
     @Transactional
     public void removeAttachmentFile(Article article, long fileNo) {
-        genFileService.remove(article.getModelName(), article.getId(), "common", "attachment", fileNo);
+        genFileService.remove(article.getModelName(), article.getId(), "templates/common", "attachment", fileNo);
     }
 
     public Page<Article> findByTag(String tagContent, Pageable pageable) {

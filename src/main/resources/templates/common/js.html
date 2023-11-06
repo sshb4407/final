@@ -1,0 +1,16 @@
+<script th:inline="javascript">
+    // 일반 메세지
+    const msg = /*[[${msg}]]*/ null;
+
+    if ( msg ) alert(msg);
+
+    // 에러 메세지
+    const localStorageKeyAboutHistoryBackFailMsg = /*[[${localStorageKeyAboutHistoryBackFailMsg}]]*/ null;
+    const historyBackFailMsg = /*[[${historyBackFailMsg}]]*/ null;
+
+    if (localStorageKeyAboutHistoryBackFailMsg && localStorageKeyAboutHistoryBackFailMsg.trim().length > 0) {
+        localStorage.setItem(localStorageKeyAboutHistoryBackFailMsg, historyBackFailMsg);
+    }
+
+    history.back();
+</script>
