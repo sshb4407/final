@@ -1,0 +1,99 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|결제 상세|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <script src="https://js.tosspayments.com/v1"></script>
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|결제|"></span>
+        </h1>
+
+        <script th:inline="javascript">
+            const orderId = /*[[ ${order.id} ]]*/ null;
+            const buyerName = /*[[ ${order.buyer.nickname} ]]*/ null;
+            const orderName = /*[[ ${order.name} ]]*/ null;
+            const orderPayPrice = /*[[ ${order.calculatePayPrice} ]]*/ null;
+        </script>
+
+        <section class="section section-write container mx-auto">
+
+            <div class="px-2 pt-4">
+                <h1 class="font-bold text-lg">주문 상세내용</h1>
+
+                <div class="flex flex-col gap-4 mt-3">
+
+                    <div>
+                        주문번호 : [[${order.id}]]
+                    </div>
+
+                    <div class="flex flex-row">
+                        <div>
+                            주문일시 :&nbsp;
+                        </div>
+                        <div>
+                            <div th:text="${#temporals.format(order.createDate, 'yyyy-MM-dd')}"></div>
+                            <div th:text="${#temporals.format(order.createDate, 'HH:mm:ss')}"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        주문자 : [[${order.buyer.nickname}]]
+                    </div>
+
+                    <div>
+                        <div class="mb-4">주문 상세</div>
+                        <div th:each="orderItem : ${order.orderItems}">
+                            <div>
+                                강의명 : <span th:text="${orderItem.product.lecture.subject}"></span> /
+                                강사명 : <span th:text="${orderItem.product.producer.producerName}"></span> /
+                                <span th:text="${#numbers.formatDecimal(orderItem.salePrice, 0, 'COMMA', 0, 'POINT')}"></span> 원
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <span>최종 환불가격 : </span>
+                        <span id="PaymentForm__pgPayPriceDisplay"></span>
+                    </div>
+
+                    <form method="post" th:action>
+                        <select name="refundReason" class="select select-primary w-full max-w-xs mr-4" required>
+                            <option value="" disabled selected>환불사유</option>
+                            <option>강의 주제가 예상과달라서</option>
+                            <option>강의의 난이도가 맞지않아서</option>
+                            <option>강의의 질이 낮아서</option>
+                            <option>단순 변심</option>
+                        </select>
+
+                        <input class="btn btn-primary" type="submit" value="환불 요청">
+                    </form>
+
+                </div>
+            </div>
+        </section>
+
+        <script>
+            const $PaymentForm__pgPayPriceDisplay = $("#PaymentForm__pgPayPriceDisplay");
+
+            const pgPayPrice = orderPayPrice;
+
+            $PaymentForm__pgPayPriceDisplay.text(formatPrice(pgPayPrice));
+
+            function formatPrice(value) {
+                return new Intl.NumberFormat('ko-KR').format(value) + ' 원';
+            }
+        </script>
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

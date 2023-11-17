@@ -9,10 +9,33 @@
 <div class="flex-1 flex items-center justify-center" layout:fragment="content">
     <th:block th:replace="common/fragments :: toastuiEidtorLib"></th:block>
 
+    <div class="flex flex-col fixed top-[264px] left-0 self-start ml-4 side" >
+        <span class="text-xl mb-4">강의 제작</span>
+        <ul class="steps steps-vertical">
+            <li class="step step-primary">강의 소개 작성</li>
+            <li class="step step-primary">수업 영상 등록</li>
+            <li class="step">강의 가격 설정</li>
+        </ul>
+    </div>
+
+    <script>
+        function updateDivVisibility() {
+            const divElement = document.querySelector('.side');
+            if (window.innerWidth <= 1860) { // 화면 넓이가 768px 이하인지 확인
+                divElement.classList.add('hidden'); // hidden 클래스 추가
+            } else {
+                divElement.classList.remove('hidden'); // hidden 클래스 제거
+            }
+        }
+
+        window.addEventListener('resize', updateDivVisibility); // 화면 크기가 변경될 때마다 함수 호출
+        updateDivVisibility(); // 페이지 로딩 시 함수를 초기 호출하여 적절한 상태 설정
+    </script>
+
     <div class="container w-full px-4">
         <h1 class="mb-4">
-            <i class="fa-solid fa-pen"></i>
-            <span th:text="|강의 생성|"></span>
+            <i class="fa-solid fa-file-pen"></i>
+            <span th:text="|내 강의 만들기|"></span>
         </h1>
 
         <button class="btn btn-sm btn-outline my-4 addBlockButton">수업 추가</button>
@@ -35,20 +58,17 @@
                 </label>
                 <input class="file-input file-input-bordered"
                        name="videos"
-                       type="file">
+                       type="file"
+                       accept=".mp4,.avi,.mov,.wmv">
             </div>
 
             <button type="button" id="last" class="btn btn-sm btn-outline my-4 w-20 addBlockButton">수업 추가</button>
 
             <div class="flex flex-col gap-2">
                 <button class="btn btn-block btn-primary gap-1">
-                    <i class="fa-solid fa-pen"></i>
-                    <span>강의 등록</span>
+                    <i class="fa-solid fa-upload"></i>
+                    <span>등록 완료</span>
                 </button>
-
-                <div class="text-center">
-                    <a class="btn btn-link" href="/templates/usr/lecture/list">목록으로</a>
-                </div>
             </div>
 
         </form>
@@ -84,8 +104,6 @@
                     <li>
                         동영상 변환이 완료되면 작성하신 커리큘럼을 확인하실 수 있습니다.
                     </li>
-
-
                 </ul>
 
 
@@ -165,7 +183,7 @@
                     if (rs.success) {
                         let lectureId = rs.data;
                         setTimeout(() => {
-                            window.location.href = `/usr/lecture/detail/${lectureId}`;
+                            window.location.href = `/usr/product/write/lecture/${lectureId}`;
                         }, 5000);
                     }
                 })

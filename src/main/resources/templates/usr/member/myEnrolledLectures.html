@@ -1,0 +1,73 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|나의 강의 목록|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4">
+        <h1 class="mb-4 flex flex-row justify-between items-center">
+            <div>
+                <i class="fa-solid fa-chalkboard"></i>
+                <span th:text="|나의 강의 목록|"></span>
+            </div>
+            <a class="btn btn-primary btn-sm" href="/usr/member/myLectures">돌아가기</a>
+        </h1>
+
+        <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-[20px]">
+            <li th:each="lecture : ${lectures}">
+                <div class="card bg-base-100 shadow-xl" >
+                    <div class="card-body">
+
+                        <a class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3" th:href="|/usr/lesson/list/${lecture.id}|">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">강의번호</span>
+                                </label>
+                                <div th:text="${lecture.id}"></div>
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">등록일</span>
+                                </label>
+                                <div th:text="${#temporals.format(lecture.createDate, 'yy.MM.dd')}"></div>
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">강사명</span>
+                                </label>
+                                <div th:text="${lecture.producer.producerName}"></div>
+                            </div>
+
+                            <div class="form-control col-span-full">
+                                <label class="label">
+                                    <span class="label-text">제목</span>
+                                </label>
+                                <a class="link truncate" th:href="|/usr/lesson/list/${lecture.id}|"
+                                   th:text="${lecture.subject}"></a>
+                            </div>
+
+                            <div class="form-control col-span-full">
+                                <label class="label">
+                                    <span class="label-text">태그</span>
+                                </label>
+                                <div th:utext="${lecture.getTagLinks('<a class=`link` href=`%s`>#%s</a>', '/usr/lecture/listByTag/%s')}"></div>
+                            </div>
+
+                            <div class="form-control col-span-full">
+                                <div class="label label-txt">수강중인 학생 수</div>
+                                <div th:text="${#numbers.formatDecimal(lecture.members.size, 0, 'COMMA', 0, 'POINT')} + ' 명'"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+</body>

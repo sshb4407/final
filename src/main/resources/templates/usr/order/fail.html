@@ -1,0 +1,33 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|결제 실패|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|결제 실패|"></span>
+        </h1>
+
+        <div>
+            주문 결제실패
+        </div>
+
+        <div>
+            주문번호 : [[${orderId}]]
+        </div>
+
+        <div>[[${message}]]</div>
+        <div>[[${code}]]</div>
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

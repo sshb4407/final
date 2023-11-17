@@ -7,7 +7,7 @@
 
 <body>
 
-<th:block th:fragment="bookListItemCard(post)">
+<th:block th:fragment="seriesListItemCard(series)">
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
 
@@ -16,43 +16,43 @@
                     <label class="label">
                         <span class="label-text">번호</span>
                     </label>
-                    <div th:text="${book.id}"></div>
+                    <div th:text="${series.id}"></div>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">작성일</span>
                     </label>
-                    <div th:text="${#temporals.format(book.createDate, 'yy.MM.dd')}"></div>
+                    <div th:text="${#temporals.format(series.createDate, 'yy.MM.dd')}"></div>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">저자</span>
                     </label>
-                    <div th:text="${book.author.producerName}"></div>
+                    <div th:text="${series.author.producerName}"></div>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">공개</span>
                     </label>
-                    <div th:text="${book.publicHanName}"></div>
+                    <div th:text="${series.publicHanName}"></div>
                 </div>
 
                 <div class="form-control col-span-full">
                     <label class="label">
                         <span class="label-text">제목</span>
                     </label>
-                    <a class="link truncate" th:href="|/usr/book/detail/${book.id}?listUrl=${@rq.encodedCurrentUrl}|"
-                       th:text="${book.subject}"></a>
+                    <a class="link truncate" th:href="|/usr/series/detail/${series.id}?listUrl=${@rq.encodedCurrentUrl}|"
+                       th:text="${series.subject}"></a>
                 </div>
 
                 <div class="form-control col-span-full">
                     <label class="label">
                         <span class="label-text">태그</span>
                     </label>
-                    <div th:utext="${book.getTagLinks('<a class=`link` href=`%s`>#%s</a>', @rq.getSuitableListByTagPageBaseUrlByCurrentUrl('book') + '/%s')}"></div>
+                    <div th:utext="${series.getTagLinks('<a class=`link` href=`%s`>#%s</a>', @rq.getSuitableListByTagPageBaseUrlByCurrentUrl('series') + '/%s')}"></div>
                 </div>
             </div>
         </div>
@@ -518,9 +518,9 @@
             </a>
 
             <a
-                    th:href="@{|${queryStrBase}page=${itemPage.number + 1 - pageArmSize - 1}|}"
-                    th:if="${itemPage.number + 1 - pageArmSize > 2}"
-                    class="join-item btn"
+                th:href="@{|${queryStrBase}page=${itemPage.number + 1 - pageArmSize - 1}|}"
+                th:if="${itemPage.number + 1 - pageArmSize > 2}"
+                class="join-item btn"
             >...</a>
 
             <th:block th:if="${2 <= itemPage.totalPages - 1}">
@@ -629,8 +629,8 @@
 <!--                    <label class="label">-->
 <!--                        <span class="label-text">본문</span>-->
 <!--                    </label>-->
-<!--                    <a class="link" target="_blank" th:href="|/usr/post/listByKeyword/${book.postKeyword.id}|"-->
-<!--                       th:text="|#${book.postKeyword.content}(${book.postKeyword.total})|"></a>-->
+<!--                    <a class="link" target="_blank" th:href="|/usr/post/listByKeyword/${series.postKeyword.id}|"-->
+<!--                       th:text="|#${series.postKeyword.content}(${series.postKeyword.total})|"></a>-->
 <!--                </div>-->
 
                 <div class="form-control col-span-full">
@@ -655,34 +655,41 @@
 <th:block th:fragment="lectureListItemCard(lecture)">
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-
-            <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
+            <a class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3" th:href="|/usr/lecture/detail/${lecture.id}|">
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">게시물번호</span>
+                        <span class="label-text">강의번호</span>
                     </label>
                     <div th:text="${lecture.id}"></div>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">작성일</span>
+                        <span class="label-text">등록일</span>
                     </label>
                     <div th:text="${#temporals.format(lecture.createDate, 'yy.MM.dd')}"></div>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">작성자</span>
+                        <span class="label-text">강사명</span>
                     </label>
                     <div th:text="${lecture.producer.producerName}"></div>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">공개</span>
+                        <span class="label-text">상태</span>
                     </label>
                     <div th:text="${lecture.publicHanName}"></div>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">가격</span>
+                    </label>
+                    <div th:unless="${lecture.product.free}" th:text="${#numbers.formatDecimal(lecture.product.price, 0, 'COMMA', 0, 'POINT')} + ' 원'"></div>
+                    <div th:if="${lecture.product.free}">무료강의</div>
                 </div>
 
                 <div class="form-control col-span-full">
@@ -699,7 +706,7 @@
                     </label>
                     <div th:utext="${lecture.getTagLinks('<a class=`link` href=`%s`>#%s</a>', '/usr/lecture/listByTag/%s')}"></div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </th:block>

@@ -10,10 +10,26 @@
     <th:block th:replace="common/fragments :: toastuiEidtorLib"></th:block>
 
     <div class="container w-full px-4">
-        <h1 class="mb-4">
-            <i class="fa-regular fa-file-word"></i>
-            <span th:text="|${lecture.subject} 대시보드|"></span>
+        <h1 class="mb-4 flex flex-row items-center justify-between">
+            <div>
+                <i class="fa-regular fa-star"></i>
+                <span th:text="|${lecture.subject} 대시보드|"></span>
+            </div>
         </h1>
+
+        <div th:if="${@rq.login}" class="flex flex-row justify-start sticky top-[64px] bg-white z-50">
+            <a class="btn btn-primary m-4 flex flex-col"
+                th:unless="${@rq.isMemberEnrolledInLecture(lecture.id)} or ${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
+                th:attr="href=${@productService.isLectureFree(lecture.id)} ? '/usr/member/enroll/' + ${lecture.id} : '/usr/cart/write/lecture/' + ${lecture.id}">
+                <div th:unless="${lecture.product.free}" th:text="${#numbers.formatDecimal(lecture.product.price, 0, 'COMMA', 0, 'POINT')} + ' 원'"></div>
+                <div >
+                    수강신청
+                </div>
+            </a>
+            <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
+               class="btn btn-primary btn-sm m-4"
+               th:href="|/usr/lecture/modify/${lecture.id}|">강의 정보 수정</a>
+        </div>
 
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
@@ -47,6 +63,14 @@
                         <div th:text="${lecture.publicHanName}"></div>
                     </div>
 
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">가격</span>
+                        </label>
+                        <div th:unless="${lecture.product.free}" th:text="${#numbers.formatDecimal(lecture.product.price, 0, 'COMMA', 0, 'POINT')} + ' 원'"></div>
+                        <div th:if="${lecture.product.free}">무료강의</div>
+                    </div>
+
                     <div class="form-control col-span-full">
                         <label class="label">
                             <span class="label-text">제목</span>
@@ -71,40 +95,56 @@
                         </div>
                     </div>
 
-                    <div class="form-control col-span-full" th:each="fileEntry : ${filesMap}">
+                    <div class="form-control col-span-full " th:each="fileEntry : ${filesMap}">
                         <label class="label">
                             <span class="label-text">강의자료 <span th:text="${fileEntry.key}"></span></span>
                         </label>
 
-                        <a th:href="|${fileEntry.value.downloadUrl}|" class="link">
+                        <div>
                             <i class="fa-regular fa-file"></i>
                             강의자료
                             <span th:text="${fileEntry.key}"></span>
                             (<span th:text="${fileEntry.value.originFileName}"></span>)
-                            다운로드
-                        </a>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-6">
-                    <div class="text-center">
-                        <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
-                           class="btn btn-link"
-                           th:href="|/usr/lecture/modify/${lecture.id}|">수정</a>
-                        <a onclick="return confirm('정말로 삭제하시겠습니까?');"
-                           th:if="${@lectureService.checkProducerCanRemove(@rq.member, lecture).success}"
-                           class="btn btn-link"
-                           th:href="|/usr/lecture/remove/${lecture.id}|" method="POST">삭제</a>
-                        <a class="btn btn-link" th:href="|/usr/lecture/list|">목록</a>
-                    </div>
-                </div>
+
             </div>
         </div>
 
 
-        <h1 class="my-4">
-            <i class="fa-regular fa-file-word"></i>
-            <span th:text="|${lecture.subject} 커리큘럼|"></span>
+        <h1 class="my-4 mt-8">
+            <span class="text-lg">커리큘럼</span>
+            <a th:href="|/usr/lesson/${lecture.id}/modify|" th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success} and ${lecture.lessonsReady}"
+                    class="btn btn-sm btn-primary ml-16">커리큘럼 수정하기</a>
         </h1>
+
+        <div class="" th:if="${lecture.lessonsReady}">
+            <table class="table">
+                <!-- head -->
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>수업 제목</th>
+                    <th>수업 길이</th>
+                </tr>
+                </thead>
+                <tbody th:each="lesson : ${lessons}">
+                <tr>
+                    <th th:text="|${lesson.sortNo} 강 |"></th>
+                    <td>
+                        <i class="fa-regular fa-circle-play mx-1"></i>
+                        <i class="fa-solid fa-play mx-1"></i>
+                        <span class="ml-4" th:text="${lesson.subject}"></span>
+                    </td>
+                    <td th:text="${lesson.lessonLengthForPrint}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="flex justify-center mt-8">
+                <a class="btn btn-link" th:href="|/usr/lecture/list|">목록</a>
+            </div>
+        </div>
 
         <div class="" th:if="${!lecture.lessonsReady}">
             <div class="alert alert-info" >
@@ -113,40 +153,12 @@
                 </svg>
                 <span>강의가 업로드 중 입니다.</span>
             </div>
-            <div class="text-center">
-                <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success} and ${lessons.isEmpty()}"
-                   class="btn btn-link"
-                   th:href="|/usr/lesson/${lecture.id}/write|">커리큘럼 등록</a>
+            <div class="flex justify-center mt-8">
+                <a class="btn btn-link" th:href="|/usr/lecture/list|">목록</a>
             </div>
         </div>
-
-        <div class="card bg-base-100 shadow-xl " th:if="${lecture.lessonsReady}">
-            <div class="card-body">
-                <div class="detail grid grid-rows-[repeat(auto-fit,minmax(70px,1fr))] gap-3">
-                    <div th:each="lesson : ${lessons}" class="text-left my-4 flex flex-row">
-                        <span class="btn btn-active btn-neutral mr-2 -ml-4 flex-none" th:text="|${lesson.sortNo} 강 |"></span>
-                        <a th:href="|/usr/lesson/hls/${lesson.id}|" class="text-left btn btn-outline w-[160px] mr-2 max-w-[160px] flex-grow"
-                           th:text="${lesson.subject}">
-                        </a>
-                        <span class="btn btn-active btn-neutral mr-2 flex-none" th:text="${lesson.lessonLengthForPrint}"></span>
-                    </div>
-                </div>
-                <div class="flex flex-row justify-center">
-                    <div class="text-center">
-                        <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success} and !${lessons.isEmpty()}"
-                           class="btn btn-link"
-                           th:href="|/usr/lesson/${lecture.id}/modify|">커리큘럼 수정</a>
-                    </div>
-                    <div class="text-center">
-                        <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success} and ${lessons.isEmpty()}"
-                           class="btn btn-link"
-                           th:href="|/usr/lesson/${lecture.id}/write|">커리큘럼 등록</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
+
 
 </div>
 

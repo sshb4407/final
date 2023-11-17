@@ -1,0 +1,48 @@
+<html layout:decorate="~{adm/common/layout}">
+
+<head>
+    <title th:text="|정산|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|정산 데이터 조회|"></span>
+        </h1>
+
+        <div class="flex">
+            <form method="post" th:action>
+                <select name="yearMonth" class="select select-bordered">
+
+                </select>
+
+                <input class="btn btn-primary" type="submit" value="정산 데이터 조회">
+            </form>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var select = document.querySelector('select[name="yearMonth"]');
+                    var currentYear = new Date().getFullYear();
+                    var currentMonth = new Date().getMonth() + 1;
+
+                    for (var year = currentYear; year >= 2023; year--) {
+                        for (var month = (year === currentYear ? currentMonth : 12); month >= 1; month--) {
+                            var monthValue = month < 10 ? '0' + month : month;
+                            var option = new Option(year + '-' + monthValue, year + '-' + monthValue);
+                            select.add(option);
+                        }
+                    }
+                });
+            </script>
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

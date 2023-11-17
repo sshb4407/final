@@ -1,0 +1,141 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|강의 생성|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+
+    <div class="flex flex-col fixed top-[264px] left-0 self-start ml-4 side" >
+        <span class="text-xl mb-4">강의 제작</span>
+        <ul class="steps steps-vertical">
+            <li class="step step-primary">강의 소개 작성</li>
+            <li class="step step-primary">수업 영상 등록</li>
+            <li class="step step-primary">강의 가격 설정</li>
+        </ul>
+    </div>
+
+    <script>
+        function updateDivVisibility() {
+            const divElement = document.querySelector('.side');
+            if (window.innerWidth <= 1860) { // 화면 넓이가 768px 이하인지 확인
+                divElement.classList.add('hidden'); // hidden 클래스 추가
+            } else {
+                divElement.classList.remove('hidden'); // hidden 클래스 제거
+            }
+        }
+
+        window.addEventListener('resize', updateDivVisibility); // 화면 크기가 변경될 때마다 함수 호출
+        updateDivVisibility(); // 페이지 로딩 시 함수를 초기 호출하여 적절한 상태 설정
+    </script>
+
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-file-pen"></i>
+            <span th:text="|내 강의 만들기|"></span>
+        </h1>
+
+        <form th:action method="POST" class="flex flex-col items-center gap-3"
+              onsubmit="submitWriteForm(this); return false;">
+
+
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div class="justify-start">
+                        <label class="label">
+                            <span class="label-text">강의</span>
+                        </label>
+                        <div th:text="${lecture.subject}"></div>
+                    </div>
+
+                    <ul class="mt-4 list-disc mx-5 text-red-500 ">
+                        <li>
+                            무료공개를 원하시면 체크박스 체크와 가격을 0원으로 작성해주세요.
+                        </li>
+                    </ul>
+
+                    <div class="form-control">
+                        <label class="cursor-pointer label">
+                            <span class="label-text">무료공개 여부</span>
+                        </label>
+
+                        <input type="checkbox" name="free" value="true" class="checkbox checkbox-primary">
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">가격 설정</span>
+                        </label>
+                        <div class="flex flex-row items-center border-b-2 border-solid border-black inline-flex" style="width: fit-content;">
+                            <span class="m-2">₩</span>
+                            <input type="number" name="price" placeholder="가격" class="input" style="outline: none;"
+                                   maxlength="50" min="0">
+                            <span class="m-2 text-red-500">가격을 설정해주세요.</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 mt-8 gap-2">
+                        <input class="btn btn-primary" type="submit" value="강의 등록">
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            let submitWriteFormDone = false;
+
+            function submitWriteForm(form) {
+                if (submitWriteFormDone) {
+                    return;
+                }
+
+                form.price.value = form.price.value.trim();
+
+                if (form.price.value.length == 0) {
+                    toastWarning("가격을 입력해주세요.");
+                    form.price.focus();
+
+                    return;
+                }
+
+                if (!validatePriceBasedOnCheckbox()) {
+                    return;
+                }
+
+                form.submit();
+                submitWriteFormDone = true;
+            }
+
+            function validatePriceBasedOnCheckbox() {
+                const checkbox = document.querySelector('input[name="free"]');
+                const priceInput = document.querySelector('input[name="price"]');
+
+                if (checkbox.checked) {
+                    if (priceInput.value !== '0') {
+                        toastWarning("무료공개를 원하시면 가격을 0원으로 설정해주세요.");
+                        priceInput.focus();
+                        return false;
+                    }
+                } else {
+                    if (priceInput.value === '0') {
+                        toastWarning("무료공개를 원하지 않으시면 가격을 0원 이상으로 설정해주세요.");
+                        priceInput.focus();
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+        </script>
+
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

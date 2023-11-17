@@ -1,0 +1,70 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|${lecture.subject}|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+
+    <div class="container w-full px-4">
+        <div class="flex flex-row justify-between">
+            <h1 class="my-4">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span th:text="|${lecture.subject} 커리큘럼|"></span>
+            </h1>
+            <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
+               class="btn btn-primary btn-sm m-4"
+               th:href="|/usr/lecture/modify/${lecture.id}|">강의 정보 수정</a>
+        </div>
+
+
+        <div class="form-control col-span-full" th:each="fileEntry : ${filesMap}">
+            <label class="label">
+                <span class="label-text">강의자료 <span th:text="${fileEntry.key}"></span></span>
+            </label>
+
+            <a th:href="|${fileEntry.value.downloadUrl}|" class="link">
+                <i class="fa-regular fa-floppy-disk"></i>
+                강의자료
+                <span th:text="${fileEntry.key}"></span>
+                (<span th:text="${fileEntry.value.originFileName}"></span>)
+                다운로드
+            </a>
+        </div>
+
+        <div class="max-w-[1000px] mt-16" th:if="${lecture.lessonsReady}">
+            <table class="table">
+                <!-- head -->
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>수업 제목</th>
+                    <th>수업 길이</th>
+                </tr>
+                </thead>
+                <tbody th:each="lesson : ${lessons}">
+                <tr>
+                    <th th:text="|${lesson.sortNo} 강 |"></th>
+                    <td class="">
+                        <a th:href="|/usr/lesson/hls/${lesson.id}|">
+                            <i th:if="${@lessonService.isLessonCompleted(lesson.id, lesson.lessonLength)}" class="fa-solid fa-circle-check"></i>
+                            <i th:unless="${@lessonService.isLessonCompleted(lesson.id, lesson.lessonLength)}" class="fa-regular fa-circle-check"></i>
+                            <i class="fa-solid fa-play mx-1"></i>
+                            <span class="ml-4" th:text="${lesson.subject}"></span>
+                        </a>
+                    </td>
+                    <td th:text="${lesson.lessonLengthForPrint}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

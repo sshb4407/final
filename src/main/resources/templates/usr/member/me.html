@@ -77,14 +77,15 @@
 
         <div class="mt-6">
             <div class="text-center">
-                <a class="btn btn-link" href="/templates/usr/member/logout">로그아웃</a>
+                <a class="btn btn-link" href="/usr/member/logout">로그아웃</a>
                 <a th:if="${@rq.member.modifyAvailable}" class="btn btn-link"
-                   href="/templates/usr/member/checkPassword?redirectUrl=/usr/member/modify">회원정보수정</a>
+                   href="/usr/member/checkPassword?redirectUrl=/usr/member/modify">회원정보수정</a>
                 <a class="btn btn-link"
-                   href="/templates/usr/member/checkPassword?redirectUrl=/usr/member/beProducer"
+                   href="/usr/member/checkPassword?redirectUrl=/usr/member/beProducer"
                    th:text="${@rq.producerPageName}"
                 ></a>
-                <a class="btn btn-link" href="/templates/usr/member/withdrawal">회원탈퇴</a>
+                <a class="btn btn-link" href="/usr/member/checkPassword?redirectUrl=/usr/member/myPayments">내 결제기록(환불신청)</a>
+                <a class="btn btn-link" href="/usr/member/withdrawal">회원탈퇴</a>
             </div>
         </div>
     </div>

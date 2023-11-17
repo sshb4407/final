@@ -1,0 +1,118 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|시리즈 - ${series.subject}|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <th:block th:replace="common/fragments :: toastuiEidtorLib"></th:block>
+
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-book-open"></i>
+            <span th:text="|시리즈|"></span>
+        </h1>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">번호</span>
+                        </label>
+                        <div th:text="${series.id}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">작성일</span>
+                        </label>
+                        <div th:text="${#temporals.format(series.createDate, 'yy.MM.dd')}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">저자</span>
+                        </label>
+                        <div th:text="${series.author.producerName}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">공개여부</span>
+                        </label>
+                        <div th:text="${series.publicHanName}"></div>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">본문</span>
+                        </label>
+                        <a class="link" th:href="|/usr/post/listByKeyword/${series.postKeyword.id}|"
+                           th:text="|#${series.postKeyword.content}(${series.postKeyword.total})|"></a>
+                    </div>
+
+                    <div class="form-control col-span-full">
+                        <label class="label">
+                            <span class="label-text">제목</span>
+                        </label>
+                        <div th:text="${series.subject}"></div>
+                    </div>
+
+                    <div class="form-control col-span-full">
+                        <label class="label">
+                            <span class="label-text">태그</span>
+                        </label>
+                        <div th:utext="${series.getTagLinks('<a class=`link` href=`%s`>#%s</a>', @rq.getSuitableListByTagPageBaseUrlByCurrentUrl('series') + '/%s')}"></div>
+                    </div>
+
+                    <div class="form-control col-span-full">
+                        <label class="label">
+                            <span class="label-text">내용</span>
+                        </label>
+                        <div class="toastui-editor-contents"
+                             style="overflow-wrap: break-word;"
+                             th:utext="${series.bodyHtmlForPrint}">
+                        </div>
+                    </div>
+
+                    <div class="form-control col-span-full" th:each="fileEntry : ${filesMap}">
+                        <label class="label">
+                            <span class="label-text">첨부파일 <span th:text="${fileEntry.key}"></span></span>
+                        </label>
+
+                        <a th:href="|${fileEntry.value.downloadUrl}|" class="link">
+                            <i class="fa-regular fa-file"></i>
+                            첨부파일
+                            <span th:text="${fileEntry.key}"></span>
+                            (<span th:text="${fileEntry.value.originFileName}"></span>)
+                            다운로드
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <div class="text-center">
+                        <a th:if="${@seriesService.checkActorCanModify(@rq.member, series).success}"
+                           class="btn btn-link"
+                           th:href="|/usr/series/modify/${series.id}|">수정</a>
+                        <a onclick="return confirm('정말로 삭제하시겠습니까?');"
+                           th:if="${@seriesService.checkActorCanRemove(@rq.member, series).success}"
+                           class="btn btn-link"
+                           th:href="|/usr/series/remove/${series.id}|" method="POST">삭제</a>
+                        <a th:with="listUrl = ${param.listUrl != null ? param.listUrl : '/usr/series/list'}"
+                           class="btn btn-link" th:href="${listUrl}">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

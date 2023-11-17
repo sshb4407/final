@@ -1,0 +1,108 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|결제 상세|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <script src="https://js.tosspayments.com/v1"></script>
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|결제|"></span>
+        </h1>
+
+        <script th:inline="javascript">
+            const orderId = /*[[ ${order.id} ]]*/ null;
+            const buyerName = /*[[ ${order.buyer.nickname} ]]*/ null;
+            const orderName = /*[[ ${order.name} ]]*/ null;
+            const orderPayPrice = /*[[ ${order.calculatePayPrice} ]]*/ null;
+        </script>
+
+        <section class="section section-write container mx-auto">
+
+            <div class="px-2 pt-4">
+                <h1 class="font-bold text-lg">주문 상세내용</h1>
+
+                <div class="flex flex-col gap-4 mt-3">
+
+                    <div>
+                        주문번호 : [[${order.id}]]
+                    </div>
+
+                    <div class="flex flex-row">
+                        <div>
+                            주문일시 :&nbsp;
+                        </div>
+                        <div>
+                            <div th:text="${#temporals.format(order.createDate, 'yyyy-MM-dd')}"></div>
+                            <div th:text="${#temporals.format(order.createDate, 'HH:mm:ss')}"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        주문자 : [[${order.buyer.nickname}]]
+                    </div>
+
+                    <div>
+                        <div class="mb-4">주문 상세</div>
+                        <div th:each="orderItem : ${order.orderItems}">
+                            <div>
+                                강의명 : <span th:text="${orderItem.product.lecture.subject}"></span> /
+                                강사명 : <span th:text="${orderItem.product.producer.producerName}"></span> /
+                                <span th:text="${#numbers.formatDecimal(orderItem.salePrice, 0, 'COMMA', 0, 'POINT')}"></span> 원
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${order.payable}">
+                        <button th:if="${order.payable}" onclick="payment();" class="btn btn-primary">카드결제</button>
+                        <div class="mt-4">
+                            <span>최종 결제가격 : </span>
+                            <span id="PaymentForm__pgPayPriceDisplay"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <a th:if="${order.isPaid}" href="/" class="btn btn-primary btn">홈으로 이동</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            const $PaymentForm__pgPayPriceDisplay = $("#PaymentForm__pgPayPriceDisplay");
+
+            const pgPayPrice = orderPayPrice;
+
+            $PaymentForm__pgPayPriceDisplay.text(formatPrice(pgPayPrice));
+
+            const tossPayments = TossPayments("클라이언트 키");
+
+            function formatPrice(value) {
+                return new Intl.NumberFormat('ko-KR').format(value) + ' 원';
+            }
+
+            function payment() {
+                const method = "카드"; // "카드" 혹은 "가상계좌"
+
+                const paymentData = {
+                    amount: orderPayPrice,
+                    orderId: "order__" + orderId + "__" + (Math.random() + "").substring(2),
+                    orderName,
+                    customerName: buyerName,
+                    successUrl: window.location.origin + "/usr/order/" + orderId + "/success",
+                    failUrl: window.location.origin + "/usr/order/" + orderId + "/fail"
+                };
+
+                tossPayments.requestPayment(method, paymentData);
+            }
+        </script>
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

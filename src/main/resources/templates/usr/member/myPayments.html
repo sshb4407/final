@@ -1,0 +1,58 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title>내 결제</title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            내 결제 목록
+        </h1>
+
+        <div class="overflow-x-auto">
+            <table class="table table-compact w-full">
+                <thead>
+                <tr>
+                    <th>결제번호</th>
+                    <th>결제일시</th>
+                    <th>상태</th>
+                    <th>상품명</th>
+                    <th>결제가격</th>
+                    <th>결제취소</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id}"></td>
+                    <td>
+                        <div th:text="${#temporals.format(order.createDate, 'yyyy-MM-dd')}"></div>
+                        <div th:text="${#temporals.format(order.createDate, 'HH:mm:ss')}"></div>
+                    </td>
+                    <td th:if="${order.refunded}" th:text="'환불처리'">Refunded</td>
+                    <td th:unless="${order.refunded}" th:text="'결제완료'">Not Refunded</td>
+                    <td th:text="${order.name}"></td>
+                    <td th:text="${#numbers.formatDecimal(order.calculatePayPrice, 0, 'COMMA', 0, 'POINT')} + ' 원'"></td>
+                    <td th:if="${#temporals.createNow().minusHours(3).isBefore(order.createDate) and !order.refunded}">
+                        <a th:href="|/usr/order/refund/${order.id}|"
+                           class="btn btn-primary btn-xs">결제취소</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

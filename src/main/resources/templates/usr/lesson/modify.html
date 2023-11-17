@@ -1,7 +1,7 @@
 <html layout:decorate="~{usr/common/layout}">
 
 <head>
-    <title th:text="|강의 - ${lecture.subject}|"></title>
+    <title th:text="|강의 수정 - ${lecture.subject}|"></title>
     <style>
 
         @media (max-width: 767px) {
@@ -21,105 +21,36 @@
 <div class="flex-1 flex items-center justify-center" layout:fragment="content">
 
     <div class="container w-full px-4">
-        <h1 class="mb-4">
-            <i class="fa-regular fa-file-word"></i>
-            <span th:text="|${lecture.subject} 대시보드|"></span>
+
+        <h1 class="my-4">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span th:text="|${lecture.subject} 커리큘럼 수정|"></span>
         </h1>
 
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <div class="detail grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text">강의번호</span>
-                        </label>
-                        <div th:text="${lecture.id}"></div>
-                    </div>
-
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text">등록일</span>
-                        </label>
-                        <div th:text="${#temporals.format(lecture.createDate, 'yy.MM.dd')}"></div>
-                    </div>
-
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text">강사명</span>
-                        </label>
-                        <div th:text="${lecture.producer.producerName}"></div>
-                    </div>
-
-                    <div th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
-                         class="form-control">
-                        <label class="label">
-                            <span class="label-text">상태</span>
-                        </label>
-                        <div th:text="${lecture.publicHanName}"></div>
-                    </div>
-
-                    <div class="form-control col-span-full">
-                        <label class="label">
-                            <span class="label-text">제목</span>
-                        </label>
-                        <div th:text="${lecture.subject}"></div>
-                    </div>
-
-                    <div class="form-control col-span-full">
-                        <label class="label">
-                            <span class="label-text">태그</span>
-                        </label>
-                        <div th:utext="${lecture.getTagLinks('<a class=`link` href=`%s`>#%s</a>', '/usr/article/listByTag/%s')}"></div>
-                    </div>
-
-                    <div class="form-control col-span-full">
-                        <label class="label">
-                            <span class="label-text">내용</span>
-                        </label>
-                        <div class="toastui-editor-contents"
-                             style="overflow-wrap: break-word;"
-                             th:utext="${lecture.bodyHtmlForPrint}">
-                        </div>
-                    </div>
-
-                    <div class="form-control col-span-full" th:each="fileEntry : ${filesMap}">
-                        <label class="label">
-                            <span class="label-text">강의자료 <span th:text="${fileEntry.key}"></span></span>
-                        </label>
-
-                        <a th:href="|${fileEntry.value.downloadUrl}|" class="link">
-                            <i class="fa-regular fa-file"></i>
-                            강의자료
-                            <span th:text="${fileEntry.key}"></span>
-                            (<span th:text="${fileEntry.value.originFileName}"></span>)
-                            다운로드
-                        </a>
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <div class="text-center">
-                        <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
-                           class="btn btn-link"
-                           th:href="|/usr/lecture/modify/${lecture.id}|">수정</a>
-                        <a onclick="return confirm('정말로 삭제하시겠습니까?');"
-                           th:if="${@lectureService.checkProducerCanRemove(@rq.member, lecture).success}"
-                           class="btn btn-link"
-                           th:href="|/usr/lecture/remove/${lecture.id}|" method="POST">삭제</a>
-                        <a class="btn btn-link" th:href="|/usr/lecture/list|">목록</a>
-                    </div>
-                </div>
+        <div class="alert shadow-lg mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div>
+                <h3 class="font-bold">수업의 제목, 영상, 순서를 변경해보세요!</h3>
+                <ul th:fragment="postTagInputDesc" class="mt-4 list-disc mx-5 text-gray-400 ">
+                    <li>
+                        수정을 원하는 수업의 <span class="text-red-400">제목</span> 을 클릭하여 삭제, 수정이 가능합니다.
+                    </li>
+                    <li>
+                        우측상단의 <span class="text-red-400">커리큘럼 순서 바꾸기</span> 를 눌러 순서를 바꿀 수 있습니다.
+                    </li>
+                    <li>
+                        우측하단의 <span class="text-red-400">수업 추가</span> 를 눌러 순서를 바꿀 수 있습니다.
+                    </li>
+                </ul>
             </div>
         </div>
 
 
-        <h1 class="my-4">
-            <i class="fa-regular fa-file-word"></i>
-            <span th:text="|${lecture.subject} 커리큘럼 수정|"></span>
-        </h1>
-
         <div class="card bg-base-100 shadow-xl " >
             <div class="card-body">
                 <div class="detail grid grid-rows-[repeat(auto-fit,minmax(70px,1fr))] gap-3">
+
+
 
                     <div class="flex justify-end">
                         <a th:href="|/usr/lesson/${lecture.id}/modifySortNo|" class="modifySortNoTag btn btn-sm btn-outline btn-primary">커리큘럼 순서 바꾸기</a>
@@ -145,10 +76,11 @@
 
                     <div th:each="lesson : ${lessons}" class="text-left my-2 flex">
                         <span class="btn btn-active btn-neutral flex-none mr-2 -ml-4" th:text="|${lesson.sortNo} 강 |"></span>
-                        <button type="button" class="btn btn-primary flex-grow max-w-[160px] mr-2 "
+                        <button type="button" class="btn btn-outline btn-primary flex-grow max-w-[460px] mr-2 "
                                 th:attr="onclick=${lesson.lessonReady} ? 'modifyFormModal'+${lesson.id}+'.showModal()'
                                  : 'toastWarning(\'해당 수업은 동영상 변환 작업중 입니다. 현재 수정이 불가능합니다.\')'"
-                                th:text="${lesson.subject}">
+                                >
+                            <span class="loading loading-spinner" th:unless="${lesson.lessonReady}"></span><span th:text="${lesson.subject}"></span>
                         </button>
                         <span class="btn btn-active btn-neutral flex-none mr-2" th:text="${lesson.lessonLengthForPrint}"></span>
 
@@ -476,7 +408,7 @@
                 <div class="">
                     <div class="text-center">
                         <a th:if="${@lectureService.checkProducerCanModify(@rq.member, lecture).success}"
-                           class="btn btn-link"
+                           class="btn btn-primary"
                            th:href="|/usr/lecture/detail/${lecture.id}|">수정 완료</a>
                     </div>
                 </div>

@@ -1,0 +1,106 @@
+<html layout:decorate="~{usr/common/layout}">
+
+<head>
+    <title th:text="|수강 바구니|"></title>
+</head>
+
+<body>
+
+<div class="flex-1 flex items-center justify-center" layout:fragment="content">
+    <div class="container w-full px-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-pen"></i>
+            <span th:text="|수강 바구니|"></span>
+        </h1>
+
+        <div class="flex flex-row justify-between" >
+            <div class="flex flex-row items-center">
+                <input type="checkbox" class="cartItemCheckboxAll checkbox m-4">
+                <div>전체 선택</div>
+            </div>
+
+            <a href="/usr/lecture/list" class="btn btn-primary btn-sm">강의 더 둘러보기</a>
+        </div>
+
+        <div class="" >
+            <table class="table">
+                <!-- head -->
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>강의명</th>
+                    <th>강사명</th>
+                    <th>가격</th>
+                </tr>
+                </thead>
+                <tbody th:each="item : ${items}" class="">
+                <tr>
+                    <th>
+                        <input onchange="CartItemCheckbox__changed();" type="checkbox" class="cartItemCheckbox checkbox" th:value="${item.id}">
+                    </th>
+                    <td th:text="${item.product.lecture.subject}"></td>
+                    <td th:text="${item.product.producer.producerName}"></td>
+                    <td th:text="${#numbers.formatInteger(item.product.price, 0, 'COMMA')} + ' 원'"></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <a href="javascript:;" onclick="RemoveCartItemsForm__submit();" class="btn btn-secondary btn-sm">선택삭제</a>
+        <form method="POST" name="removeCartItemsForm" th:action="@{|/usr/cart/remove|}" hidden>
+            <input type="hidden" name="ids">
+        </form>
+
+        <a href="javascript:;" onclick="OrderCartItemsForm__submit();" class="btn btn-primary btn-sm">전체 주문하기</a>
+        <form method="POST" name="orderCartItemsForm" th:action="@{|/usr/order/makeOrder|}" hidden></form>
+
+        <script>
+            // 전체선택 체크박스
+            const $cartItemCheckboxAll = $('.cartItemCheckboxAll');
+            // 아이템 체크박스
+            const $cartItemCheckbox = $('.cartItemCheckbox');
+
+            $cartItemCheckboxAll.change(function () {
+                const allChecked = $(this).prop('checked');
+                $cartItemCheckbox.prop('checked', allChecked); // 아이템 체크박스들에게 체크상태 동기화
+            });
+
+            function CartItemCheckbox__changed() {
+                const allChecked = $cartItemCheckbox.length == $('.cartItemCheckbox:checked').length;
+
+                $cartItemCheckboxAll.prop('checked', allChecked);
+            }
+
+            let RemoveCartItemsForm__submitDone = false;
+
+            function RemoveCartItemsForm__submit() {
+                if (RemoveCartItemsForm__submitDone) return;
+
+                const form = document.removeCartItemsForm;
+
+                const $checked = $('.cartItemCheckbox:checked');
+
+                if ($checked.length == 0) {
+                    toastWarning('삭제할 장바구니 품목을 선택해주세요.');
+                    return;
+                }
+
+                const ids = $checked.map((index, el) => $(el).val()).get();
+                form.ids.value = ids;
+                form.submit();
+                RemoveCartItemsForm__submitDone = true;
+            }
+
+            function OrderCartItemsForm__submit() {
+                document.orderCartItemsForm.submit();
+            }
+        </script>
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

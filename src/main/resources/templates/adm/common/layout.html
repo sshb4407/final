@@ -42,6 +42,7 @@
                     tabindex="0">
                     <li th:if="${@rq.login}"><a href="/"><i class="fa-solid fa-user"></i> 일반모드</a></li>
                     <li th:if="${@rq.login}"><a href="/adm/member/list"><i class="fa-solid fa-users"></i> 회원목록</a></li>
+                    <li th:if="${@rq.login}"><a href="/adm/rebate/makeData"><i class="fa-solid fa-calculator"></i> 정산조회</a></li>
                     <li th:if="${@rq.login}"><a href="/usr/member/logout"><i
                             class="fa-solid fa-arrow-right-from-bracket"></i> 로그아웃</a></li>
                 </ul>
